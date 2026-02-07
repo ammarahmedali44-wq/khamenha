@@ -4,23 +4,21 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const GameManager = require('./GameManager');
 const { log } = require('./logger');
-const path = require('path'); // 👈 تأكد إن السطر ده موجود
+const path = require('path');
 
-// 👇👇👇 السطر ده هو اللي ناقص عندك أو مكانه غلط! ضيفه هنا حالاً 👇👇👇
+// 👇👇👇 هذا السطر هو الأهم! لازم يكون هنا قبل أي app.use 👇👇👇
 const app = express(); 
 
 app.use(cors());
 
-// 👇 ده الكود اللي إحنا ضفناه (دلوقتي هيشتغل صح لأن app بقى موجود)
+// الآن الكود سيعمل لأن app تم تعريفه خلاص
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-// ... كمل باقي الكود زي ما هو (const server = http.createServer(app); ... إلخ)
-
-const server = http.createServer(app);
+// ... كمل باقي الكود (const server = http.createServer(app); ... إلخ)
 const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 });
