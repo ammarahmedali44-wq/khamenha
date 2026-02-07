@@ -1,0 +1,1792 @@
+/* 👇 1. استيراد خطوط Lalezar و Changa من جوجل */
+@import url('https://fonts.googleapis.com/css2?family=Changa:wght@400;500;600;700;800&family=Lalezar&display=swap');
+
+
+
+/* 👇 2. تخصيص الخطوط كما طلبت */
+
+/* أي زرار في الموقع + حقول الكتابة -> ياخد خط Lalezar */
+button, 
+.action-btn, 
+.game-input, 
+input[type="text"],
+.btn-restart-simple,
+.btn-result-orange {
+  font-family: 'Lalezar', system-ui !important;
+  letter-spacing: 0.5px; /* خط Lalezar حروفه متماسكة، بنوسعها سنة صغيرة */
+}
+
+/* الأسئلة (h2) والعناوين (h1, h3) -> تاخد خط Changa */
+h1, h2, h3, h4, h5, h6,
+.winner-title-text,
+.winner-name-text,
+.waiting-text,
+.card-content-text, /* نصوص الإجابات في شاشة النتائج */
+.card-source-text {
+  font-family: 'Changa', sans-serif !important;
+  line-height: 1.4; /* تحسين مسافات السطور للقراءة */
+}
+
+/* تعديل بسيط عشان الأرقام الإنجليزية في خط Changa تظهر بشكل مظبوط */
+span {
+  font-family: 'Changa', sans-serif; 
+}
+
+
+/* --- 1. المتغيرات والألوان --- */
+:root {
+  --bg-yellow: #FFC107;
+  --box-border: #FF3D00;
+  --header-orange: #FF5722;
+  --inner-bg: #FFF8E1;
+  --btn-teal: #009688;
+  --text-dark: #3E2723;
+}
+
+/* --- 2. إعدادات الصفحة الأساسية (تعديل للموبايل) --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh; /* يسمح للصفحة بالطول حسب المحتوى */
+  background-color: var(--bg-yellow);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden; /* منع التمرير الجانبي فقط */
+  overflow-y: auto;   /* ✅ السماح بالتمرير الرأسي */
+  direction: rtl;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.full-screen-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  /* 👇 1. التعديل عشان يخلي الكلام في النص بالظبط */
+  justify-content: center; 
+  
+  width: 100%;
+  min-height: 100vh;
+  
+  background-color: #FFC107;
+
+  /* 👇 2. الخلفية الجديدة: علامات استفهام عشوائية ومائلة وكبيرة */
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='300' height='300' viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23E65100' fill-opacity='0.08'%3E%3Ctext x='50' y='150' font-family='Arial' font-size='120' font-weight='900' transform='rotate(-25 50 150)'%3E?%3C/text%3E%3Ctext x='220' y='80' font-family='Arial' font-size='90' font-weight='bold' transform='rotate(15 220 80)'%3E?%3C/text%3E%3Ctext x='260' y='250' font-family='Arial' font-size='60' font-weight='bold' transform='rotate(-10 260 250)'%3E?%3C/text%3E%3Ctext x='40' y='280' font-family='Arial' font-size='50' font-weight='bold' transform='rotate(30 40 280)'%3E?%3C/text%3E%3C/g%3E%3C/svg%3E");
+
+  /* تثبيت الخلفية */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: repeat;
+  
+  /* 👇 تكبير حجم الباترن عشان العلامات تبان ضخمة */
+  background-size: 350px 350px; 
+  
+  color: #333;
+  position: relative;
+  
+  /* مسافات أمان عشان المحتوى ميكونش لازق في الحواف */
+  padding: 20px; 
+  box-sizing: border-box;
+}
+
+/* تعديل بسيط عشان اللوجو والانتظار ميبوظوش الخلفية */
+.waiting-box, .scoreboard-frame, .results-grid-unified {
+    background-color: transparent; 
+}
+/* عشان نضمن إن الخلفية تبان */
+.waiting-box, .scoreboard-frame, .results-grid-unified {
+    background-color: transparent; 
+}
+
+/* --- 3. العناوين والنصوص --- */
+.game-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #D84315;
+  text-shadow: 2px 2px 0px #FFEB3B;
+  margin-bottom: 20px;
+}
+
+.title-text {
+  color: #BF360C;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.waiting-text {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  animation: pulse 1.5s infinite;
+  padding-bottom: 20px; /* مسافة إضافية في الموبايل */
+}
+
+/* --- 4. تصميم البوكسات --- */
+.info-box-container {
+  width: 90%; /* ✅ عرض أكبر قليلاً للموبايل */
+  max-width: 350px;
+  border: 4px solid var(--box-border);
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 15px; /* زيادة المسافة بين البوكسات */
+  overflow: hidden;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  flex-shrink: 0; /* يمنع انكماش البوكس */
+}
+
+.info-box-header {
+  background-color: var(--header-orange);
+  color: white;
+  padding: 10px 12px;
+  font-weight: 900;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--box-border);
+  cursor: pointer;
+}
+
+.info-box-content {
+  padding: 10px;
+  background-color: var(--inner-bg);
+}
+
+/* --- 5. شبكة اللاعبين --- */
+.mini-players-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 10px;
+  padding: 10px;
+}
+
+.mini-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.mini-player img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  z-index: 1;
+  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.2));
+}
+
+.player-name-tag {
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #3E2723;
+  background: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  border: 2px solid #3E2723;
+  margin-top: -15px;
+  z-index: 2;
+  transform: rotate(-3deg);
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+}
+
+.empty-slot { opacity: 0.3; }
+.empty-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ccc;
+  border: 2px dashed #777;
+}
+
+/* --- 6. الفئات --- */
+.categories-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.cat-btn-style {
+  background-color: #FFB300;
+  color: white;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 0 #F57F17;
+}
+
+.cat-btn-style.active {
+  background-color: var(--btn-teal);
+  border: 2px solid #00796B;
+  color: white;
+}
+
+.cat-btn-style.locked {
+  opacity: 0.7;
+  cursor: default;
+  filter: grayscale(0.5);
+}
+
+/* --- 7. الأزرار والإدخال --- */
+.action-btn, .menu-btn, .action-btn-green {
+  background-color: var(--btn-teal);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 900;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  margin: 10px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #00695C;
+  width: 85%; /* للموبايل */
+  max-width: 300px;
+}
+
+.action-btn:active, .action-btn-green:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.name-input, .time-input-style {
+  padding: 10px;
+  border: 3px solid var(--box-border);
+  border-radius: 10px;
+  font-size: 1.2rem;
+  text-align: center;
+  color: var(--text-dark);
+  font-weight: bold;
+  outline: none;
+  background: white;
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #333;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* --- 8. الباركود --- */
+.qr-box-style {
+  background: white;
+  padding: 8px;
+  border: 4px solid var(--box-border);
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.share-btn-style {
+  background: var(--btn-teal);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #004D40;
+}
+
+/* --- 9. الأسهم وتخصيص الشخصية --- */
+.customizer-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.avatar-center {
+  background: rgba(255, 255, 255, 0.3);
+  border: 3px solid white;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--box-border);
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* =========================================
+   تنسيقات شاشة اللعب (Game Screen Design)
+   ========================================= */
+
+/* عنوان الدور (مثل الصورة: "دور: هادي") */
+.turn-header {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #FF5722; /* برتقالي محمر */
+  text-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+/* حاوية قائمة الأزرار (عشان يبقوا تحت بعض) */
+.category-stack-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px; /* مسافة بين الأزرار */
+  width: 100%;
+}
+
+/* زر الفئة (مثل الصورة: أخضر تركواز عريض) */
+.game-category-btn {
+  background-color: #009688; /* التركواز */
+  color: white;
+  width: 80%;
+  max-width: 300px; /* لا يصبح عريضاً جداً على الكمبيوتر */
+  padding: 15px 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px; /* حواف ناعمة قليلاً */
+  box-shadow: 0 5px 0 #00796B; /* ظل غامق */
+  cursor: pointer;
+  transition: transform 0.1s;
+  font-family: inherit;
+}
+
+.game-category-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.game-category-btn:disabled {
+  background-color: #B2DFDB;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================
+   تصميم أيقونة الدور (Turn Avatar Design)
+   ========================================= */
+
+.turn-avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+/* دائرة مضيئة خلف اللاعب */
+.avatar-glow {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  border: 4px solid #FF5722; /* برتقالي */
+  padding: 5px;
+  box-shadow: 0 0 15px rgba(255, 87, 34, 0.4);
+  margin-bottom: 10px;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* اسم اللاعب */
+.turn-player-name {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #3E2723; /* بني غامق */
+  margin: 0;
+  text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* =========================================
+   تصميم شاشة السؤال (Writing Phase)
+   ========================================= */
+
+/* 1. شريط الوقت العلوي */
+.timer-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-color: #ECEFF1;
+  z-index: 100;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  background-color: #FF3D00; /* لون الشريط أحمر/برتقالي */
+  width: 100%;
+  /* الأنيميشن سيتم تفعيله من الجافاسكريبت */
+  transform-origin: left;
+}
+
+@keyframes deplete {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* 2. الهيدر (معلومات الجولة والتاغ الأحمر) */
+.writing-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.stage-badge {
+  background-color: #FF5722; /* العلامة البرتقالية في الزاوية اليسرى */
+  width: 80px;
+  height: 40px;
+  border-bottom-right-radius: 10px;
+  /* للتزيين فقط كما في الصورة */
+}
+
+.round-indicator {
+  color: #FFF; /* أو أصفر فاتح */
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-top: 10px;
+  margin-right: 20px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+}
+
+/* 3. النصوص (اسم الفئة والسؤال) */
+.category-title-large {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #F57F17; /* برتقالي غامق */
+  margin: 10px 0;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.2);
+}
+
+.question-text-large {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #BF360C; /* أحمر طوبي */
+  margin-bottom: 30px;
+  max-width: 90%;
+  line-height: 1.4;
+}
+
+/* 4. حقل الإدخال (البيج الفاتح) */
+.input-styled-yellow {
+  background-color: #FFF9C4; /* لون بيج/أصفر فاتح */
+  border: none;
+  border-radius: 15px;
+  padding: 15px;
+  width: 85%;
+  max-width: 350px;
+  font-size: 1.2rem;
+  text-align: center;
+  color: #5D4037;
+  font-weight: bold;
+  outline: none;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+.input-styled-yellow::placeholder {
+  color: #A1887F;
+}
+
+/* 5. زر الإجابة (التركواز) */
+.submit-btn-teal {
+  background-color: #009688;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 900;
+  padding: 10px 40px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #00695C;
+  width: auto;
+  min-width: 150px;
+}
+.submit-btn-teal:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+/* =========================================
+   تنسيقات شاشة التخمين (Guessing Phase)
+   ========================================= */
+
+/* شبكة الاختيارات */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* عمودين */
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+/* زر الاختيار (موحد للجميع) */
+.option-btn-unified {
+  background-color: #009688; /* تركواز */
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 15px 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #00695C;
+  min-height: 60px;
+  transition: transform 0.1s;
+  word-wrap: break-word; /* لكسر الكلام الطويل */
+}
+
+.option-btn-unified:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* عند اختيار إجابة */
+.option-btn-unified.selected {
+  border: 4px solid #FFEB3B; /* برواز أصفر */
+  transform: scale(0.98);
+}
+
+/* الإجابة الخاصة باللاعب (نخفي تمييزها بصرياً لكن نمنع الضغط عليها) */
+.option-btn-unified:disabled {
+  cursor: default;
+  opacity: 1; /* نجعلها تبدو طبيعية تماماً */
+  /* إذا كانت هي المختارة، تظل عادية */
+}
+
+/* زر النتيجة في الأسفل (شكل جمالي) */
+.result-label-btn {
+  background-color: #FF5722; /* برتقالي */
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 900;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 0 #E64A19;
+  margin-top: 20px;
+  pointer-events: none; /* غير قابل للضغط */
+}
+/* =========================================
+   شاشة النتائج (Results Phase)
+   ========================================= */
+
+/* =========================================
+   شاشة النتائج (Results Phase) - التصميم الجديد
+   ========================================= */
+
+.results-grid-styled {
+  display: flex;
+  flex-direction: column;
+  gap: 40px; /* مسافة كبيرة بين الصناديق عشان الأفاتارات متدخلش في بعض */
+  width: 90%;
+  max-width: 350px;
+  margin: 20px auto; /* توسيط */
+}
+
+/* حاوية الصندوق (ضرورية عشان العناصر العائمة تتمحور حولها) */
+.result-box-container-relative {
+  position: relative;
+  width: 100%;
+  /* overflow: visible; مهم جداً عشان الأفاتارات تظهر بره الصندوق */
+}
+
+/* ... (الجزء العلوي من results-grid-styled و result-box-container-relative يبقى كما هو) ... */
+
+/* الصندوق نفسه - تنسيق أساسي موحد */
+.styled-result-box {
+  width: 100%;
+  border-radius: 15px;
+  padding: 15px 10px;
+  min-height: 115px; /* زيادة بسيطة في الطول */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  background-color: white; /* ✅ خلفية بيضاء موحدة للجميع */
+  border-width: 4px; /* إطار سميك */
+  box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+/* =========================================
+   شاشة النتائج - التصميم الأبيض (White Theme)
+   ========================================= */
+
+.results-grid-styled {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px 15px;
+  width: 95%;
+  max-width: 500px;
+  margin: 10px auto;
+  padding-bottom: 20px;
+}
+
+.result-box-container-relative {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* الصندوق الموحد (أبيض للكل) */
+.styled-result-box {
+  width: 100%;
+  background-color: #ffffff !important; /* ✅ إجبار اللون الأبيض */
+  border-radius: 15px;
+  padding: 15px 5px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 5;
+  border: 2px solid transparent; /* تحضير للإطار الملون */
+}
+
+/* نص الإجابة */
+.box-answer-text {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #333;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+/* شكل الكبسولة/البادج العام */
+.box-author-badge {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+  width: auto;
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+}
+
+/* --- 1. تخصيص الإجابة الصحيحة (ستايل التركواز) --- */
+.box-real {
+  border-color: #009688; /* إطار الصندوق */
+}
+.box-real .box-author-badge {
+  background-color: #009688; /* خلفية الكبسولة */
+  color: white; /* نص أبيض */
+  box-shadow: 0 2px 0 #00796B;
+}
+
+/* --- 2. تخصيص إجابة اللاعب (ستايل البرتقالي) --- */
+.box-fake {
+  border-color: #FF5722; /* إطار الصندوق */
+}
+.box-fake .box-author-badge {
+  background-color: #FFCCBC; /* خلفية الكبسولة (برتقالي فاتح جداً) */
+  color: #D84315; /* نص الاسم (برتقالي غامق) */
+  border: 1px solid #FF5722;
+}
+
+/* الأفاتارات العائمة */
+.floating-voter {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+  background-color: #eee;
+}
+
+/* المواقع */
+.le-top-left { top: -10px; left: -10px; transform: rotate(-10deg); }
+.le-top-right { top: -10px; right: -10px; transform: rotate(10deg); }
+.le-bottom-left { bottom: -10px; left: -10px; transform: rotate(10deg); }
+.le-bottom-right { bottom: -10px; right: -10px; transform: rotate(-10deg); }
+
+/* =========================================
+   شاشة النتائج - تصميم Stage 4 (مع المصوتين)
+   ========================================= */
+
+.results-grid-unified {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px 15px; /* زيادة المسافة الرأسية عشان الصور متدخلش في بعض */
+  width: 90%;
+  max-width: 450px;
+  margin: 20px auto;
+}
+
+/* الكارت الموحد */
+.result-card-teal {
+  background-color: #009688;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 5px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 0 #00796B;
+  
+  /* 👇 مهم جداً عشان الصور تظهر بره الصندوق */
+  position: relative; 
+  overflow: visible; 
+}
+
+/* نص الإجابة */
+.card-content-text {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+/* النص السفلي (مصدر الإجابة) */
+.card-source-text {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #B2DFDB;
+}
+
+/* ... (كود الشبكة result-card-teal إلخ يبقى كما هو) ... */
+
+/* 👥 مجموعة المصوت (الصورة + الاسم) */
+.voter-group-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20; /* رقم عالي عشان يظهر فوق كل حاجة */
+  width: 60px; /* عرض محدد لتنسيط الاسم */
+}
+
+/* تكبير الصورة */
+.voter-avatar-large {
+  width: 50px;  /* ✅ كبرنا الحجم (كان 25px) */
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid white; /* إطار أبيض يبرز الصورة */
+  background: #eee;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  object-fit: cover;
+}
+
+/* اسم اللاعب تحت الصورة */
+.voter-name-tag {
+  background-color: white;
+  color: #333;
+  font-size: 0.75rem; /* خط صغير ومقروء */
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: -8px; /* تداخل بسيط مع الصورة */
+  white-space: nowrap; /* الاسم على سطر واحد */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 1px solid #ddd;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 📍 ضبط أماكن الزوايا (محتاجين نطلعهم بره شوية عشان الحجم كبر) */
+.corner-0 { top: -25px; left: -20px; }   /* أعلى يسار */
+.corner-1 { top: -25px; right: -20px; }  /* أعلى يمين */
+.corner-2 { bottom: -25px; left: -20px; } /* أسفل يسار */
+.corner-3 { bottom: -25px; right: -20px; } /* أسفل يمين */
+
+/* زر النتيجة */
+.btn-result-orange {
+  background-color: #FF5722;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 10px 50px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 0 #E64A19;
+  cursor: pointer;
+  margin-top: 20px;
+}
+/* =========================================
+   إصلاح شاشة التخمين (Guessing Phase Fix)
+   ========================================= */
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* عمودين متساويين دائماً */
+  gap: 15px; /* مسافة بين الأزرار */
+  width: 95%; /* تأخذ عرض الشاشة بالكامل تقريباً في الموبايل */
+  max-width: 400px; /* لا تكبر جداً في الشاشات الكبيرة */
+  margin: 20px auto; /* توسيط */
+}
+
+.option-btn-unified {
+  background-color: #009688; /* تركواز */
+  color: white;
+  font-size: 1.1rem; /* حجم خط مناسب للموبايل */
+  font-weight: bold;
+  padding: 15px 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #00695C;
+  min-height: 70px; /* ارتفاع أدنى عشان الزرار يكون واضح */
+  width: 100%; /* ملء الخانة بالكامل */
+  
+  /* لضمان عدم خروج النص الطويل */
+  word-wrap: break-word; 
+  white-space: normal;
+}
+
+.option-btn-unified:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.option-btn-unified:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.option-btn-unified.selected {
+  border: 4px solid #FFEB3B;
+  transform: scale(0.98);
+}
+/* =========================================
+   شاشة لوحة المتصدرين (Scoreboard) - تعديل Stage 6
+   ========================================= */
+
+.scoreboard-frame {
+  background-color: #FF5722;
+  padding: 15px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  margin: 20px auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.scoreboard-paper {
+  background-color: #FFF8E1;
+  border-radius: 8px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* الصف الواحد */
+.score-row {
+  display: flex;
+  align-items: center; /* محاذاة في المنتصف */
+  gap: 5px; /* تقليل المسافة عشان الشخصية تبان كأنها واقفة جنب البار */
+  padding: 0 20px;
+  
+  direction: ltr; /* اتجاه من الشمال لليمين */
+  
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 70px; /* زيادة الارتفاع لفك الضغط */
+  box-sizing: border-box;
+  transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* الأفاتار (بدون دائرة) */
+.score-avatar-wrapper {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  margin-bottom: 5px; /* رفع بسيط */
+}
+
+.score-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent; /* ❌ إلغاء الخلفية البيضاء */
+  border: none; /* ❌ إلغاء الإطار */
+  border-radius: 0; /* ❌ إلغاء التدوير */
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); /* ظل للشخصية نفسها */
+  transform: scale(1.3); /* تكبير الشخصية شوية عشان تملى المكان */
+}
+
+/* اسم اللاعب */
+.score-player-name {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #5D4037;
+  position: absolute;
+  bottom: 0;
+  background: rgba(255,255,255,0.8); /* خلفية خفيفة للاسم عشان يبان */
+  padding: 0 5px;
+  border-radius: 4px;
+  box-shadow: none;
+  border: none;
+}
+
+/* مسار البار */
+.score-bar-track {
+  flex-grow: 1;
+  height: 28px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+}
+
+/* البار الملون (مستطيل) */
+.score-bar-fill {
+  height: 100%;
+  background-color: #009688; /* تركواز */
+  
+  /* 👇 تعديل الحواف لتكون مستطيلة (مع نعومة بسيطة جداً) */
+  border-radius: 4px; 
+  
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 15px;
+  
+  transition: width 1s ease-out;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.1); /* ظل خفيف تحت البار */
+  min-width: 40px;
+}
+
+/* رقم النقاط */
+.score-text {
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.btn-result-orange {
+  background-color: #FF5722;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 10px 50px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 0 #E64A19;
+  cursor: pointer;
+}
+
+/* =========================================
+   شاشة نهاية اللعبة - تصميم Stage 6 (بسيط ونظيف)
+   ========================================= */
+
+.game-over-screen-final {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #E91E63; /* الخلفية الزهرية */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* مسافات بين العناصر */
+  z-index: 2000;
+}
+
+/* كلمة "الفائز" */
+.winner-title-text {
+  color: #FFEB3B; /* أصفر */
+  font-size: 3rem; /* حجم كبير للموبايل */
+  font-weight: 900;
+  margin: 0;
+  text-shadow: 0 4px 0 rgba(0,0,0,0.1); /* ظل خفيف للنص */
+}
+
+/* صورة الفائز (بدون إطار أو خلفية) */
+.winner-avatar-clean {
+  width: 160px; /* حجم مناسب للموبايل */
+  height: 160px;
+  object-fit: contain;
+  /* تأثير ظل للصورة نفسها عشان تبرز عن الخلفية */
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+  
+  /* أنيميشن بسيط */
+  animation: floatAvatar 3s ease-in-out infinite;
+}
+
+/* اسم الفائز */
+.winner-name-text {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin: 0;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.1);
+}
+
+/* زر إعادة اللعب (بسيط أسفل الشاشة) */
+.btn-restart-simple {
+  margin-top: 40px;
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 10px 30px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-restart-simple:hover {
+  background-color: white;
+  color: #E91E63;
+}
+
+/* حركة بسيطة للصورة */
+@keyframes floatAvatar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 💻 تنسيقات الكمبيوتر والشاشات الكبيرة */
+@media (min-width: 768px) {
+  .winner-title-text { font-size: 5rem; }
+  .winner-avatar-clean { width: 280px; height: 280px; }
+  .winner-name-text { font-size: 4rem; }
+  .game-over-screen-final { gap: 40px; }
+}
+/* =========================================
+   تحسينات التجاوب (Mobile Adjustments)
+   ========================================= */
+
+/* شاشات الموبايل الصغيرة */
+@media (max-width: 600px) {
+  /* تصغير نص الجولة قليلاً وإبعاده عن الحافة */
+  .full-screen-container {
+    padding-top: 60px; /* مساحة عشان النص ميركبش فوق المحتوى */
+  }
+}
+
+
+/* =========================================
+   تنسيق أزرار اختيار الفئات (Category Buttons)
+   ========================================= */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* عمودين */
+  gap: 15px;
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+/* تنسيق الزر نفسه */
+.category-btn {
+  background-color: #009688; /* نفس لون التركواز المستخدم في اللعبة */
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 15px 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #00796B; /* ظل للزر */
+  transition: all 0.2s;
+  min-height: 60px; /* ارتفاع مناسب */
+  
+  /* في حالة النص الطويل */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.category-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #00796B;
+}
+
+.category-btn:hover {
+  background-color: #26A69A;
+}
+
+/* تنسيق الزر المعطل (للاعبين المنتظرين) */
+.category-btn:disabled {
+  background-color: #B0BEC5; /* لون رمادي فاتح */
+  color: #546E7A;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none; /* إلغاء حركة الضغط */
+}
+
+/* =========================================
+   تنسيق مربع الإجابة وزر الإرسال
+   ========================================= */
+
+/* مربع الكتابة */
+.game-input {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1.3rem;
+  border: 3px solid #5D4037; /* إطار بني أنيق */
+  border-radius: 15px;       /* حواف دائرية */
+  text-align: center;
+  outline: none;
+  background-color: #FFF;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.1); /* ظل يعطي عمق */
+  transition: all 0.2s;
+  color: #333;
+  font-weight: bold;
+}
+
+.game-input:focus {
+  border-color: #E65100; /* تغيير لون الإطار عند الكتابة */
+  transform: translateY(-2px);
+}
+
+.game-input::placeholder {
+  color: #999;
+  font-weight: normal;
+}
+
+/* زر الإرسال */
+.action-btn {
+  background-color: #009688; /* تركواز */
+  color: white;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #00796B; /* ظل للزر */
+  transition: transform 0.1s;
+  margin-top: 10px;
+}
+
+.action-btn:active {
+  transform: translateY(4px); /* حركة الضغط */
+  box-shadow: 0 1px 0 #00796B;
+}
+
+.action-btn:hover {
+  background-color: #26A69A;
+}
+
+
+/* تنسيق زر الإرسال عندما يكون معطلاً (فارغاً) */
+.action-btn:disabled {
+  background-color: #ccc; /* لون رمادي */
+  color: #666;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================
+   شريط الوقت (Top Full Width Timer)
+   ========================================= */
+
+.timer-bar-container {
+  position: fixed;      /* تثبيت الشريط في الشاشة */
+  top: 0;
+  left: 0;
+  width: 100%;          /* عرض كامل 100% من الشاشة */
+  height: 12px;         /* ارتفاع الشريط */
+  background-color: rgba(0, 0, 0, 0.2); /* خلفية الشريط (مسار) */
+  z-index: 900;         /* طبقة عالية لكن تحت نص "الجولة" */
+  margin: 0;            /* إزالة أي هوامش */
+  border-radius: 0;     /* حواف حادة لتناسب الشاشة */
+}
+
+.timer-bar-fill {
+  height: 100%;
+  background-color: #E65100; /* لون الشريط (برتقالي) */
+  width: 100%;
+  
+  /* جعل الحركة ناعمة */
+  transform-origin: left; 
+}
+
+/* حركة التناقص */
+@keyframes deplete {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* =========================================
+   مكافحة الغش (Anti-Cheat UI)
+   ========================================= */
+
+/* 1. منع تحديد النصوص والصور في كامل التطبيق */
+body {
+  -webkit-user-select: none; /* Safari/Chrome */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
+  -webkit-user-drag: none;   /* منع سحب الصور */
+}
+
+/* 2. كلاس استثناء (للسماح بنسخ كود الغرفة فقط) */
+.allow-copy {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  cursor: pointer; /* شكل اليد */
+}
+
+
+
+/* زرار الهمبرغر الجديد */
+.hamburger-btn {
+  position: fixed; /* تثبيت فوق أي شاشة */
+  top: 15px;
+  right: 15px;
+  width: 45px;
+  height: 45px;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+  transition: transform 0.2s;
+}
+
+.hamburger-btn:active {
+  transform: scale(0.95);
+}
+
+.hamburger-btn .bar {
+  width: 25px;
+  height: 3px;
+  background-color: #E65100;
+  border-radius: 2px;
+}
+
+/* القائمة المنبثقة */
+.host-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.host-menu-content {
+  background: white;
+  width: 90%;
+  max-width: 350px;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* باقي التنسيقات للقائمة */
+.menu-player-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+.menu-avatar { width: 40px; height: 40px; border-radius: 50%; background: #eee; }
+.host-badge { background: #FFD700; color: #333; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-right: 5px; }
+.kick-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-weight: bold; }
+.players-list-scroll { overflow-y: auto; flex: 1; margin-bottom: 15px; max-height: 300px; }
+.close-menu-btn { background: #eee; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; color: #555; cursor: pointer; }
+
+
+/* تنسيقات القائمة الجديدة (ستايل الصورة) */
+.host-menu-content-styled {
+  background: #FFF9C4; /* أصفر فاتح للخلفية */
+  width: 90%;
+  max-width: 350px;
+  border-radius: 0; /* حواف حادة زي الصورة */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  overflow: hidden;
+  border: 5px solid #FF5722; /* برواز برتقالي */
+}
+
+.menu-header-orange {
+  background-color: #FF5722; /* برتقالي غامق */
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* 1. الحاوية: تباعد العناصر */
+/* 1. الحاوية: تباعد العناصر */
+.menu-body {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  /* 👇 غيرنا الرقم ده من 30 لـ 50 عشان يبعدوا عن بعض خالص */
+  gap: 50px; 
+}
+
+/* باقي الكود زي ما هو ... */
+
+/* 2. الأزرار الكبيرة (عشان نتأكد إنها واخدة الستايل) */
+.menu-big-btn {
+  background-color: #FFC107;
+  color: #3E2723;
+  border: none;
+  padding: 20px;
+  font-size: 1.3rem;
+  font-weight: 900;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100%;
+  box-shadow: 0 6px 0 #FFA000;
+  transition: transform 0.1s;
+  
+  /* 👇 ده السطر السحري اللي هيفصلهم غصب عن أي حاجة */
+  margin-bottom: 20px; 
+}
+.menu-big-btn:active {
+  transform: translateY(6px);
+  box-shadow: none;
+}
+
+/* 2. زر الإغلاق التركوازي */
+.close-menu-btn {
+  background-color: #009688;
+  color: white;
+  border: none;
+  padding: 15px;
+  width: 100%;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  
+  /* 👇 ده الرقم اللي بيتحكم في المسافة بين الأصفر الأخير والتركوازي */
+  /* غيره براحتك (مثلاً 15px قريبين، 25px متوسط) */
+  margin-top: 2px;
+  
+  box-shadow: 0 4px 0 #00796B;
+  transition: transform 0.1s;
+  font-size: 1.1rem;
+}
+
+.close-menu-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.back-link {
+  color: #E65100;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+
+
+/* تنسيقات قائمة الطرد */
+.kick-list-container {
+  max-height: 250px; /* ارتفاع محدد للقائمة */
+  overflow-y: auto; /* تفعيل السكرول لو اللاعبين كتير */
+  background: rgba(255, 255, 255, 0.5); /* خلفية نصف شفافة خفيفة */
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.kick-player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* يوزع المسافة بين الاسم والزرار */
+  background: white;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.kick-player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 👇 ده الكود اللي هيحل مشكلة الصورة العملاقة */
+.kick-avatar-small {
+  width: 40px;  /* عرض ثابت */
+  height: 40px; /* ارتفاع ثابت */
+  border-radius: 50%; /* دائرة */
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.btn-kick-action {
+  background-color: #FF5252; /* أحمر للطرد */
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.btn-kick-action:hover {
+  background-color: #D32F2F;
+}
+
+
+/* 👇 تعريف حركة شريط الوقت */
+@keyframes timerAnimation {
+  from {
+    width: 100%; /* البداية: الشريط مليان */
+  }
+  to {
+    width: 0%;   /* النهاية: الشريط فاضي */
+  }
+}
+
+
+/* --- تعديل الشبكة لتكون في المنتصف وعمودين فقط --- */
+.results-grid-unified {
+  display: grid;
+  
+  /* 👇 الإجبار على عمودين فقط في كل الشاشات (عشان تبقى عريضة زي الصورة) */
+  grid-template-columns: repeat(2, 1fr); 
+  
+  gap: 20px; /* مسافة أوسع بين الكروت */
+  width: 90%; /* عرض الشبكة بالنسبة للشاشة */
+  max-width: 1000px; /* نكبرها في الكمبيوتر عشان متكونش صغيرة */
+  margin: 0 auto; /* هذا السطر هو المسؤول عن التوسيط الأفقي */
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
+/* في شاشات الموبايل الصغيرة جداً، ممكن نخلي المسافات أقل شوية */
+@media (max-width: 480px) {
+  .results-grid-unified {
+    gap: 10px;
+    width: 95%;
+  }
+}
+
+/* --- تصميم الكارت الفيروزي (حجم متوسط ومناسب) --- */
+.result-card-teal {
+  background-color: #009688;
+  border-radius: 15px; /* تقليل التدوير قليلاً */
+  
+  /* 👇 1. تقليل الحشو الداخلي والارتفاع */
+  padding: 20px 10px; 
+  min-height: 130px; /* كان 180px، خليناه 130px عشان يصغر */
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2); /* ظل أصغر شوية */
+  text-align: center;
+  border: 3px solid rgba(255,255,255,0.15);
+  transition: transform 0.2s;
+}
+
+/* تكبير النص الأساسي (الإجابة) */
+.card-content-text {
+  color: white;
+  
+  /* 👇 2. تصغير الخط شوية ليتناسب مع الحجم الجديد */
+  font-size: 1.7rem; /* كان 2.2rem */
+  
+  font-weight: 900;
+  margin-bottom: 10px;
+  line-height: 1.2;
+  text-shadow: 0 2px 3px rgba(0,0,0,0.2);
+  word-break: break-word;
+}
+
+/* تكبير نص "إجابة فلان" */
+.card-source-text {
+  color: #E0F2F1;
+  font-size: 1rem; /* تصغير بسيط */
+  font-weight: bold;
+  background-color: rgba(0,0,0,0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* =========================================
+   تصميم أماكن المصوتين (كبير، نظيف، بدون خلفيات)
+   ========================================= */
+
+/* =========================================
+   تصميم أماكن المصوتين (كبير جداً، خام، بدون أي تأثيرات)
+   ========================================= */
+
+/* الحاوية الرئيسية للمصوت */
+.voter-group-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;          /* 👈 زيادة عرض الحاوية */
+  z-index: 20;
+  pointer-events: none;
+  
+  /* 👇 ضمان عدم وجود أي خلفية أو حدود للحاوية نفسها */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* تعديل الأماكن (إبعادها أكثر بسبب الحجم الكبير) */
+.corner-0 { bottom: -40px; right: -30px; transform: rotate(-10deg); }
+.corner-1 { bottom: -40px; left: -30px; transform: rotate(10deg); }
+.corner-2 { top: -40px; right: -30px; transform: rotate(5deg); }
+.corner-3 { top: -40px; left: -30px; transform: rotate(-5deg); }
+
+/* تنسيق الصورة (كبيرة جداً وخالية من المؤثرات) */
+/* تنسيق الصورة (كبيرة ونظيفة) */
+/* تنسيق الصورة */
+.voter-avatar-large {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  padding: 0;
+  
+  /* 👇 غيرنا القيمة لـ -25px عشان الاسم يطلع يلزق في رجل الشخصية */
+  margin-bottom: -25px; 
+  
+  position: relative;
+  z-index: 1; /* الصورة تكون تحت */
+}
+
+/* تنسيق الاسم */
+.voter-name-small {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 900;
+  background: transparent !important;
+  
+  text-shadow: none !important; /* شلنا السواد نهائي */
+  
+  position: relative;
+  z-index: 2; /* الاسم يكون فوق طرف الصورة لو حصل تداخل */
+  margin-top: 0;
+}
+
+
+
+
+
+
+
+
+/* --- تعديل الشبكة: توسيع المسافات --- */
+.results-grid-unified {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  
+  /* 👇 زودنا المسافة هنا لـ 25px (كانت 10 أو 15) عشان الكروت تبعد عن بعض */
+  gap: 25px; 
+  
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+  justify-content: center;
+  padding-bottom: 40px;
+  margin-top: 20px; /* مسافة من فوق */
+}
+
+/* في الموبايل، نوسع المسافة برضه ونقلل عرض الشبكة شوية عشان مفيش حاجة تخرج بره */
+@media (max-width: 480px) {
+  .results-grid-unified {
+    gap: 20px; /* مسافة واسعة وآمنة */
+    width: 95%;
+  }
+}
+
+/* --- تصميم الكارت --- */
+.result-card-teal {
+  background-color: #009688;
+  border-radius: 15px;
+  padding: 20px 10px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  /* 👇 مهم جداً: عشان الصور تتموضع بالنسبة للكارت ده بس */
+  position: relative; 
+  
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  text-align: center;
+  border: 3px solid rgba(255,255,255,0.15);
+  margin-bottom: 15px; /* مسافة إضافية تحت كل كارت للأمان */
+}
+
+/* --- تنسيق الصورة والاسم (العشوائي) --- */
+.voter-random-wrapper {
+  position: absolute; /* حر الحركة جوه الكارت */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
+  width: 60px; /* حجم الحاوية */
+}
+
+/* --- الـ 5 أماكن العشوائية (Slots) --- */
+/* 1. الزاوية اليمين تحت (كلاسيك) */
+.pos-0 { bottom: -25px; right: -15px; transform: rotate(-10deg); }
+
+/* 2. الزاوية الشمال تحت */
+.pos-1 { bottom: -25px; left: -15px; transform: rotate(10deg); }
+
+/* 3. الزاوية اليمين فوق */
+.pos-2 { top: -25px; right: -15px; transform: rotate(5deg); }
+
+/* 4. الزاوية الشمال فوق */
+.pos-3 { top: -25px; left: -15px; transform: rotate(-5deg); }
+
+/* 5. في النص تحت (لو حد خامس جه) */
+.pos-4 { bottom: -30px; left: 50%; transform: translateX(-50%); }
+
+
+/* تنسيق الصورة */
+.voter-avatar-random {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  background: transparent !important;
+  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
+  margin-bottom: -18px; /* تلزق في الاسم */
+}
+
+/* تنسيق الاسم */
+.voter-name-random {
+  font-size: 0.8rem;
+  color: #fff;
+  font-weight: 900;
+  text-shadow: 
+    -1px -1px 0 #000, 1px -1px 0 #000,
+    -1px 1px 0 #000, 1px 1px 0 #000;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+}
+
+
+
+/* --- أنيميشن صفحة النتائج --- */
+
+/* 1. حركة ظهور الصف (يطلع من تحت لفوق) */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. حركة تمدد البار (يبدأ من صفر ويمط بمرونة) */
+@keyframes growBarElastic {
+  0% { width: 0 !important; }
+  100% { /* العرض النهائي بيتحدد في الـ style */ }
+}
+
+/* 3. حركة الرقم (يكبر ويصغر) */
+@keyframes popNumber {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* --- تعديل اسم اللاعب في صفحة النتائج (إزالة الخلفية) --- */
+.score-player-name {
+  background: transparent !important;    /* إزالة الخلفية الرمادية/السوداء */
+  box-shadow: none !important;           /* إزالة أي ظل للصندوق */
+  border: none !important;               /* إزالة أي إطار */
+  padding: 5px 0 !important;             /* تقليل الحشو الجانبي */
+  
+  /* تنسيق النص الجديد عشان يكون واضح */
+  color: #5D4037 !important;             /* لون بني غامق مناسب لخلفية الورقة */
+  text-shadow: none !important;          /* إزالة ظل النص القديم لو موجود */
+  font-weight: 900 !important;           /* خط سميك */
+  margin-top: 5px;                       /* مسافة بسيطة بين الصورة والاسم */
+}
