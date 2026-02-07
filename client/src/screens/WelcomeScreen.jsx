@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import gameLogo from '../assets/logo.png';
 
 const WelcomeScreen = ({ onJoinGame, initialCode }) => {
   const [step, setStep] = useState(1);
@@ -49,15 +50,45 @@ const WelcomeScreen = ({ onJoinGame, initialCode }) => {
     <div className="full-screen-container">
       
       {step === 1 && (
-        <div onClick={() => setStep(2)} style={{cursor: 'pointer', transform: 'scale(1.1)'}}>
-          <h1 className="game-title">خمّنها</h1>
-          <p className="waiting-text">اضغط للمتابعة</p>
+        <div 
+          onClick={() => setStep(2)} 
+          style={{
+            cursor: 'pointer', 
+            transform: 'scale(1.1)',
+            display: 'flex',            // 👈 التعديل: تفعيل الفليكس
+            flexDirection: 'column',    // 👈 التعديل: ترتيب العناصر فوق بعض
+            alignItems: 'center',       // 👈 التعديل: سنترة أفقي
+            justifyContent: 'center'    // 👈 التعديل: سنترة رأسي
+          }}
+        >
+          <img 
+            src={gameLogo}
+            alt="دبسهم" 
+            style={{ 
+              width: '80%', 
+              maxWidth: '350px', 
+              height: 'auto', 
+              marginBottom: '20px',
+              filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.3))'
+            }} 
+          />
+          <p className="waiting-text" style={{ margin: 0 }}>اضغط للمتابعة</p>
         </div>
       )}
 
       {step === 2 && (
         <div style={{width: '100%', display:'flex', flexDirection:'column', alignItems:'center'}}>
-          <h1 className="game-title">خمّنها</h1>
+          <img 
+            src={gameLogo}
+            alt="دبسهم" 
+            style={{ 
+              width: '60%', // حجم أصغر شوية في القائمة
+              maxWidth: '250px', 
+              height: 'auto', 
+              marginBottom: '30px',
+              filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.3))'
+            }} 
+          />
           <button className="menu-btn" onClick={handleCreateRoom}>إنشاء غرفة</button>
           <button className="menu-btn" onClick={handleJoinOnline}>ادخل غرفة </button>
         </div>
@@ -72,15 +103,14 @@ const WelcomeScreen = ({ onJoinGame, initialCode }) => {
             <button className="arrow-btn" onClick={nextAvatar}>▶</button>
             
             <div className="avatar-center">
-              {/* 👇👇👇 التعديلات هنا 👇👇👇 */}
               <img 
                 src={`/avatars/${avatarId}.png`} 
                 alt="Avatar" 
                 style={{ 
-                    width: '100%',       // ✅ تم التكبير لـ 100% بدلاً من 80%
-                    height: '100%',      // ✅ لتملاء المساحة بالكامل
-                    objectFit:'contain', // للحفاظ على أبعاد الصورة
-                    borderRadius: '0'    // ✅ ضمان عدم وجود أي حواف دائرية
+                    width: '100%',
+                    height: '100%',
+                    objectFit:'contain',
+                    borderRadius: '0'
                 }} 
                 onError={(e) => { e.target.onerror = null; e.target.src = '/avatars/1.png'; }}
               />

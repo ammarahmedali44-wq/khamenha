@@ -4,9 +4,8 @@ import { getCategoryName } from '../categoriesList';
 const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote, onSelectCategory, myId, hasSubmitted, isHost, onNextRound, onShowScoreboard }) => {
   const [fakeAnswer, setFakeAnswer] = useState("");
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
-  const [fixedWinner, setFixedWinner] = useState(null); // حالة جديدة لتخزين الفائز المجمد
+  const [fixedWinner, setFixedWinner] = useState(null); 
 
-  // إضافة useEffect لتجميد الفائز عند انتهاء اللعبة
   useEffect(() => {
     if (phase === 'GAME_OVER' && players.length > 0 && !fixedWinner) {
       const sorted = [...players].sort((a, b) => b.score - a.score);
@@ -14,23 +13,27 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     }
   }, [phase, players, fixedWinner]);
 
+  // 👇 دالة عرض معلومات الجولة (الشريط العلوي)
   const renderRoundInfo = () => (
     <div style={{
       position: 'absolute',
       top: '20px',
       left: '20px',
       zIndex: 1000,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)', // خلفية شفافة عشان الكلام يبان
+      padding: '5px 15px',
+      borderRadius: '20px',
       color: '#FFF',
       fontWeight: '900',
-      fontSize: '1.2rem',
-      textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+      fontSize: '1.1rem',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
       flexDirection: 'row-reverse'
     }}>
         <span>الجولة</span>
-        <span style={{direction: 'ltr', unicodeBidi: 'embed'}}>
+        <span style={{direction: 'ltr', unicodeBidi: 'embed', color: '#FFD700'}}>
           {roundData?.roundNumber || 1}/{roundData?.totalRounds || 10}
         </span>
     </div>
@@ -43,12 +46,15 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
 
   if (!roundData) return <div className="full-screen-container"><h1 className="waiting-text">جارِ التحميل...</h1></div>;
 
-  // 👇 1. مرحلة اختيار الفئة (في المنتصف بالظبط)
+  // 👇 1. مرحلة اختيار الفئة
   if (phase === 'CATEGORY_SELECT') {
     const amITurn = myId === roundData.turnPlayerId;
     return (
       <div className="full-screen-container" style={{ justifyContent: 'center' }}>
         
+        {/* عرض رقم الجولة هنا أيضاً */}
+        {renderRoundInfo()}
+
         <div style={{marginBottom: '15px'}}>
            <img 
              src={`/avatars/${roundData.turnPlayerAvatarId}.png`} 
@@ -117,30 +123,29 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     );
   }
 
-  // 👇 2. مرحلة الكتابة (محدثة: شريط وقت + حالة اللاعبين)
+  // 👇 2. مرحلة الكتابة
   if (phase === 'WRITING') {
     const isInputEmpty = !fakeAnswer.trim();
-    // استلام قائمة من قاموا بالتسليم من السيرفر
     const submittedIds = roundData.submittedIds || [];
 
     return (
       <div className="full-screen-container" style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
         
-        {/* شريط الوقت البرتقالي */}
-       {/* شريط الوقت في مرحلة الكتابة */}
+        {/* شريط الوقت */}
         <div className="timer-bar-container" style={{width: '100%', height: '10px', backgroundColor: '#eee', position: 'absolute', top: 0, left: 0}}>
            <div 
              className="timer-bar-fill" 
-             // 👇 هذا هو السطر المهم لإعادة التايمر مع كل جولة
              key={`writing-${roundData?.roundNumber}`} 
              style={{
                height: '100%', 
                backgroundColor: '#E65100', 
                width: '100%',
-               // 👇 هنا يأخذ الوقت من البيانات القادمة من السيرفر مباشرة، لو مش موجودة يشوف الإعدادات
                animation: `timerAnimation ${roundData?.time || settings?.timePerRound || 45}s linear forwards`
            }}></div>
         </div>
+
+        {/* 👇👇👇 إضافة عداد الجولة هنا 👇👇👇 */}
+        {renderRoundInfo()}
 
         <div style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', paddingTop: '20px'}}>
             
@@ -195,14 +200,13 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             )}
         </div>
 
-        {/* 👇 قائمة اللاعبين (تظهر من جاوب ومن لا) */}
         <div style={{display: 'flex', gap: '15px', justifyContent: 'center', paddingBottom: '20px', width: '100%', flexWrap: 'wrap'}}>
            {players.map(p => {
                const isFinished = submittedIds.includes(p.id) || (p.id === myId && hasSubmitted);
                return (
                  <div key={p.id} style={{
                      display: 'flex', flexDirection: 'column', alignItems: 'center',
-                     opacity: isFinished ? 1 : 0.4, // باهت لو لم ينته
+                     opacity: isFinished ? 1 : 0.4, 
                      filter: isFinished ? 'none' : 'grayscale(100%)',
                      transition: 'all 0.3s'
                  }}>
@@ -216,32 +220,29 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     );
   }
 
- // 👇 3. مرحلة التخمين (معدلة: تم إعادة شريط الوقت + السماح باختيار النفس)
+  // 👇 3. مرحلة التخمين
   if (phase === 'GUESSING') {
     const votedIds = roundData.votedIds || [];
     const iHaveVoted = votedIds.includes(myId);
-
-    // نستخدم الوقت القادم من السيرفر أو من الإعدادات
     const roundDuration = roundData.time || settings?.timePerRound || 45;
 
     return (
       <div className="full-screen-container" style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
         
-     {/* شريط الوقت في مرحلة التخمين */}
+        {/* شريط الوقت */}
         <div className="timer-bar-container" style={{width: '100%', height: '10px', backgroundColor: '#eee', position: 'absolute', top: 0, left: 0}}>
            <div 
              className="timer-bar-fill" 
-             // 👇 تغيير المفتاح ليعيد التايمر في هذه المرحلة أيضاً
              key={`guessing-${roundData?.roundNumber}`} 
              style={{
                height: '100%', 
                backgroundColor: '#E65100', 
                width: '100%',
-               // 👇 نفس المنطق الذكي: يأخذ الوقت المحدد للجولة
                animation: `timerAnimation ${roundData?.time || settings?.timePerRound || 45}s linear forwards`
            }}></div>
         </div>
 
+        {/* 👇👇👇 إضافة عداد الجولة هنا 👇👇👇 */}
         {renderRoundInfo()}
 
         <div style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: '20px'}}>
@@ -262,12 +263,8 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
                     return (
                       <button
                         key={i}
-                        // الضغط مسموح للجميع (حتى لو إجابتك)
                         onClick={() => { setSelectedOptionIndex(i); onVote(opt); }}
-                        
-                        // القفل فقط بعد ما تختار
                         disabled={selectedOptionIndex !== null}
-                        
                         style={{
                           backgroundColor: isSelected ? '#00796B' : '#009688', 
                           color: 'white', border: 'none', padding: '15px',
@@ -278,7 +275,6 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
                           transition: 'all 0.1s'
                         }}
                       >
-                        {/* نص الإجابة فقط (بدون كلمة إجابتك) */}
                         {opt.text} 
                       </button>
                     );
@@ -295,7 +291,6 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
 
         </div>
 
-        {/* قائمة اللاعبين بالأسفل */}
         <div style={{display: 'flex', gap: '15px', justifyContent: 'center', paddingBottom: '20px', width: '100%', flexWrap: 'wrap'}}>
            {players.map(p => {
                const hasFinishedVoting = votedIds.includes(p.id);
@@ -317,12 +312,12 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     );
   }
 
- // 4. مرحلة النتائج (Updated Layout)
+  // 4. مرحلة النتائج
   if (phase === 'ROUND_RESULTS') {
     return (
       <div className="full-screen-container" style={{justifyContent: 'flex-start', paddingTop: '40px'}}>
         
-        {/* معلومات الجولة في الأعلى */}
+        {/* 👇👇👇 إضافة عداد الجولة هنا 👇👇👇 */}
         {renderRoundInfo()}
 
         <div style={{marginBottom: '25px', padding: '0 20px', marginTop: '40px', textAlign: 'center'}}>
@@ -331,7 +326,6 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             </h2>
         </div>
 
-      {/* الشبكة الجديدة */}
         <div className="results-grid-unified">
           {roundData.resultsOptions && roundData.resultsOptions.map((opt, i) => {
             const isReal = opt.type === 'REAL';
@@ -342,20 +336,14 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
                   border: isReal ? '4px solid #FFD700' : '3px solid rgba(255,255,255,0.15)',
                   backgroundColor: isReal ? '#00796B' : '#009688'
               }}>
-                
-                {/* نص الإجابة الكبير */}
                 <div className="card-content-text">
                   {opt.text}
                 </div>
-
-                {/* مصدر الإجابة */}
                 <div className="card-source-text">
                   {sourceText}
                 </div>
-
-            {/* 👇👇👇 3. انسخ الجزء ده وحطه هنا (ده الكود الجديد) 👇👇👇 */}
                 {opt.voters && opt.voters.map((v, idx) => {
-                  const posIndex = idx % 5; // بنوزعهم على 5 أماكن
+                  const posIndex = idx % 5;
                   return (
                     <div key={idx} className={`voter-random-wrapper pos-${posIndex}`}>
                        <img 
@@ -373,7 +361,6 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
           })} 
         </div>
 
-        {/* زر التالي */}
         <div style={{marginTop: 'auto', marginBottom: '30px', width:'100%', display:'flex', justifyContent:'center'}}>
            {isHost ? (
              <button className="action-btn" onClick={onShowScoreboard} style={{width: '200px', backgroundColor: '#E65100'}}>
@@ -386,8 +373,8 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
       </div>
     );
   }
-  // 👇 5. مرحلة عرض النتيجة النهائية
-  // 5. مرحلة عرض النتيجة النهائية (تم تحسين الأنيميشن 🚀)
+
+  // 5. مرحلة عرض النتيجة النهائية (Scoreboard)
   if (phase === 'SCOREBOARD') {
     const sortedPlayers = [...(roundData.players || [])].sort((a, b) => b.score - a.score);
     const maxScore = sortedPlayers.length > 0 ? sortedPlayers[0].score : 0;
@@ -398,7 +385,10 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
 
     return (
       <div className="full-screen-container">
+        
+        {/* 👇👇👇 إضافة عداد الجولة هنا 👇👇👇 */}
         {renderRoundInfo()} 
+
         <h2 style={{color:'#E65100', fontSize:'2rem', margin:'40px 0 20px', fontWeight:'900'}}>النتيجة</h2>
         
         <div className="scoreboard-frame">
@@ -410,10 +400,9 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
               return (
                 <div key={p.id} className="score-row" style={{ 
                     top: `${topPosition}px`,
-                    // 👇 كل صف بيستنى اللي قبله 0.1 ثانية
                     animation: `slideUpFade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
                     animationDelay: `${i * 0.15}s`, 
-                    opacity: 0 // نبدأ مخفيين عشان الأنيميشن يظهرنا
+                    opacity: 0 
                 }}>
                   <div className="score-avatar-wrapper">
                     <img src={`/avatars/${p.avatarId || 1}.png`} alt={p.username} className="score-avatar-img" />
@@ -423,14 +412,12 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
                   <div className="score-bar-track">
                     <div className="score-bar-fill" style={{ 
                         width: `${widthPercent}%`,
-                        // 👇 البار بيتمط بمرونة (Elastic)
                         animation: `growBarElastic 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
-                        animationDelay: `${i * 0.15 + 0.2}s` // يبدأ بعد ما الصف يظهر بشوية
+                        animationDelay: `${i * 0.15 + 0.2}s` 
                     }}>
                       <span className="score-text" style={{
-                          // 👇 الرقم بيعمل Pop
                           animation: `popNumber 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards`,
-                          animationDelay: `${i * 0.15 + 1}s`, // يظهر في الآخر خالص
+                          animationDelay: `${i * 0.15 + 1}s`, 
                           opacity: 0
                       }}>
                         {p.score}
@@ -454,11 +441,9 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     );
   }
 
-  // 👇 6. مرحلة نهاية اللعبة (GAME_OVER) - الفائز المجمد
+  // 👇 6. مرحلة نهاية اللعبة (GAME_OVER)
   if (phase === 'GAME_OVER') {
-    // استخدام الفائز المجمد الموجود في حالة fixedWinner
     const winner = fixedWinner || [...players].sort((a, b) => b.score - a.score)[0];
-    
     return (
       <div className="full-screen-container" style={{backgroundColor: '#E91E63'}}>
         <h1 style={{color: '#FDD835', fontSize: '3rem', marginBottom: '20px'}}>
@@ -468,7 +453,6 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     );
   }
 
-  // 👇 بقية الكود الأصلي
   return null;
 };
 
