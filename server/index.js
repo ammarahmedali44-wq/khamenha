@@ -4,24 +4,21 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const GameManager = require('./GameManager');
 const { log } = require('./logger');
-const path = require('path');
+const path = require('path'); // 👈 تأكد إن السطر ده موجود
 
-// 1. السماح للسيرفر بقراءة ملفات الـ React (الموجودة في فولدر dist)
+// 👇👇👇 السطر ده هو اللي ناقص عندك أو مكانه غلط! ضيفه هنا حالاً 👇👇👇
+const app = express(); 
+
+app.use(cors());
+
+// 👇 ده الكود اللي إحنا ضفناه (دلوقتي هيشتغل صح لأن app بقى موجود)
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// 2. أي رابط يطلبه المستخدم، نرجعه لصفحة اللعبة الرئيسية
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-
-
-// 👇 استيراد ملف الأسئلة JSON الجديد
-const questionsDB = require('./questions.json');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
+// ... كمل باقي الكود زي ما هو (const server = http.createServer(app); ... إلخ)
 
 const server = http.createServer(app);
 const io = new Server(server, {
