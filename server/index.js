@@ -20,7 +20,15 @@ const server = http.createServer(app);
 
 // 4. ربط Socket.io بالسيرفر اللي لسه عاملينه
 const io = new Server(server, {
-  cors: { origin: "*", methods: ["GET", "POST"] }
+ cors: {
+      origin: [
+        "http://localhost:5173",
+        "https://khamenha.onrender.com",
+        "https://dabbes-hom.com",
+        "https://www.dabbes-hom.com"
+      ],
+      methods: ["GET", "POST"]
+    }
 });
 
 // 5. توجيه الروابط لصفحة React
