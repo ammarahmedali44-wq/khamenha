@@ -55,9 +55,12 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
       >
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>
           
-          <div className="qr-box-style">
-            <QRCode value={window.location.href} size={120} />
-          </div>
+         <div className="qr-box-style">
+  <QRCode 
+    value={`${window.location.origin}/?room=${roomCode}`} 
+    size={120} // أو 256
+  />
+</div>
           
           <div style={{textAlign: 'center', marginTop: '5px'}}>
             <p style={{margin: 0, fontWeight: 'bold', color: '#3E2723', fontSize: '1rem'}}>
