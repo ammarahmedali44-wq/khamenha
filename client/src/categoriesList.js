@@ -3,7 +3,7 @@ export const categoriesList = [
   { id: 'ocean', name: 'عالم البحار ' },
   { id: 'egypt', name: 'مصر أم الدنيا ' },
   { id: 'america', name: 'أمريكا ' },
-  { id: 'kuwait', name: 'الكويت ' },
+  { id: 'KSA', name: 'المملكة العربية السعودية ' },
   { id: 'egyptian_series', name: 'مسلسلات مصرية ' },
   { id: 'history', name: 'تاريخ عام ' },
   { id: 'animals', name: 'حيوانات ' },
