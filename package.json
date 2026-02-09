@@ -1,7 +1,7 @@
 {
   "name": "khamenha",
   "version": "1.0.0",
-"scripts": {
+  "scripts": {
     "install-server": "cd server && npm install --legacy-peer-deps",
     "install-client": "cd client && npm install --legacy-peer-deps",
     "build-client": "cd client && npm run build",
@@ -10,5 +10,8 @@
   },
   "engines": {
     "node": "18.x"
+  },
+  "dependencies": {
+    "react-lazy-load-image-component": "^1.6.3"
   }
 }

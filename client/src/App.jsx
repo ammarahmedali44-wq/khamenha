@@ -414,7 +414,7 @@ function App() {
 
       {gameState === 'FINISHED' && finalWinner && (
         <div className="game-over-screen-final">
-          <h1 className="winner-title-text">النتائج</h1>
+          <h1 className="winner-title-text">الفائز هو</h1>
           <img 
             src={`/avatars/${finalWinner.avatarId}.png`} 
             alt={finalWinner.username} 
