@@ -5,7 +5,8 @@ import LobbyScreen from './screens/LobbyScreen';
 import GameScreen from './screens/GameScreen';
 import './App.css';
 
-const socket = io();
+// استبدل السطر اللي فيه io.connect بالسطر ده:
+const socket = io.connect("https://dabbes-hom.com");
 
 // 1. مكون القائمة الجانبية (تم إصلاح الخلفية الصفراء والترتيب Z-Index)
 const HostMenu = ({ players, onClose, onKick, onResetLobby }) => {
