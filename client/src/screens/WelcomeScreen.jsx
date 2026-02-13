@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import gameLogo from '../assets/logo.png';
-import SeoSection from '../components/SeoSection';
 
 const WelcomeScreen = ({ onJoinGame, initialCode }) => {
   const [step, setStep] = useState(1);
@@ -135,12 +134,6 @@ const WelcomeScreen = ({ onJoinGame, initialCode }) => {
           </div>
         </div>
       )}
-
-      // ... باقي كود الأزرار واللوجو ...
-
-{/* 👇 ضيف السطر ده في الآخر */}
-<SeoSection />
-  
     </div>
   );
 };
