@@ -18,7 +18,8 @@ export const categoriesList = [
   { id: 'riddles', name: 'ألغاز وفوازير ' },
   { id: 'currency', name: 'عملات الدول ' },
   { id: 'car_logos', name: 'شعارات سيارات ' },
-  { id: 'general', name: 'معلومات عامة ' }
+  { id: 'general', name: 'معلومات عامة ' },
+  { id : 'kuwait', name: 'الكويت ' }
 ];
 
 export const getCategoryName = (id) => {
