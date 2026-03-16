@@ -12,14 +12,16 @@ const WelcomeScreen = ({ onJoinGame, initialCode }) => {
   // 2. اختيار رقم عشوائي عند البداية
   const [avatarId, setAvatarId] = useState(() => Math.floor(Math.random() * TOTAL_AVATARS) + 1);
   
-  const [isJoinMode, setIsJoinMode] = useState(false);
+  const [isJoinMode, setIsJoinMode] = useState(!!initialCode);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   useEffect(() => {
-    if (initialCode && !isJoinMode) {
+    if (initialCode) {
       setCode(initialCode);
+      setIsJoinMode(true);
+      setStep(3); // skip straight to name entry with code pre-filled
     }
-  }, [initialCode, isJoinMode]);
+  }, [initialCode]);
 
   const nextAvatar = () => {
     setAvatarId((prev) => (prev === TOTAL_AVATARS ? 1 : prev + 1));

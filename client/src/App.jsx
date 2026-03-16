@@ -199,7 +199,10 @@ function App() {
   const [gameState, setGameState] = useState('WELCOME'); 
   const [players, setPlayers] = useState([]);
   const [myId, setMyId] = useState("");
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCode, setRoomCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('room') || "";
+  });
   const [isMyHost, setIsMyHost] = useState(false);
 
   const [gamePhase, setGamePhase] = useState('CATEGORY_SELECT'); 
