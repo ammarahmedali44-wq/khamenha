@@ -377,48 +377,55 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   // 5. مرحلة عرض النتيجة النهائية (Scoreboard)
   if (phase === 'SCOREBOARD') {
     const sortedPlayers = [...(roundData.players || [])].sort((a, b) => b.score - a.score);
-    const maxScore = sortedPlayers.length > 0 ? sortedPlayers[0].score : 0;
-    const effectiveMax = Math.max(maxScore, 1); 
-    const ROW_HEIGHT = 110; 
-    const TOP_OFFSET = 30; 
-    const paperHeight = sortedPlayers.length * ROW_HEIGHT + TOP_OFFSET + 20; 
+    const totalRounds = roundData.totalRounds || 10;
+    // Scale: max possible ~3 points per round, so full bar = totalRounds * 3
+    const scaleMax = Math.max(totalRounds * 3, 10);
+    const ROW_HEIGHT = 110;
+    const TOP_OFFSET = 30;
+    const paperHeight = sortedPlayers.length * ROW_HEIGHT + TOP_OFFSET + 20;
 
     return (
       <div className="full-screen-container">
-        
+
         {/* 👇👇👇 إضافة عداد الجولة هنا 👇👇👇 */}
-        {renderRoundInfo()} 
+        {renderRoundInfo()}
 
         <h2 style={{color:'#E65100', fontSize:'2rem', margin:'40px 0 20px', fontWeight:'900'}}>النتيجة</h2>
-        
+
         <div className="scoreboard-frame">
           <div className="scoreboard-paper" style={{ height: `${paperHeight}px` }}>
             {sortedPlayers.map((p, i) => {
-              let widthPercent = (p.score / effectiveMax) * 100;
+              const isNegative = p.score < 0;
+              // Bar width based on absolute score relative to scale max
+              // Minimum 8% so the bar is always visible, max 100%
+              let widthPercent = Math.min(100, (Math.abs(p.score) / scaleMax) * 100);
+              if (widthPercent < 8) widthPercent = 8;
+              if (p.score === 0) widthPercent = 5;
               const topPosition = i * ROW_HEIGHT + TOP_OFFSET;
-              
+
               return (
-                <div key={p.id} className="score-row" style={{ 
+                <div key={p.id} className="score-row" style={{
                     top: `${topPosition}px`,
                     animation: `slideUpFade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
-                    animationDelay: `${i * 0.15}s`, 
-                    opacity: 0 
+                    animationDelay: `${i * 0.15}s`,
+                    opacity: 0
                 }}>
                   <div className="score-avatar-wrapper">
                     <img src={`/avatars/${p.avatarId || 1}.png`} alt={p.username} className="score-avatar-img" />
                     <span className="score-player-name">{p.username}</span>
                   </div>
-                  
+
                   <div className="score-bar-track">
-                    <div className="score-bar-fill" style={{ 
+                    <div className={`score-bar-fill${isNegative ? ' negative' : ''}`} style={{
                         width: `${widthPercent}%`,
-                        animation: `growBarElastic 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
-                        animationDelay: `${i * 0.15 + 0.2}s` 
+                        animation: `growBarElastic 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, barShimmer 2.5s ease-in-out 1.5s infinite`,
+                        animationDelay: `${i * 0.15 + 0.2}s`
                     }}>
                       <span className="score-text" style={{
                           animation: `popNumber 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards`,
-                          animationDelay: `${i * 0.15 + 1}s`, 
-                          opacity: 0
+                          animationDelay: `${i * 0.15 + 1}s`,
+                          opacity: 0,
+                          color: isNegative ? '#f44336' : 'white'
                       }}>
                         {p.score}
                       </span>

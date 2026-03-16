@@ -6,14 +6,16 @@
 /* 👇 2. تخصيص الخطوط كما طلبت */
 
 /* أي زرار في الموقع + حقول الكتابة -> ياخد خط Lalezar */
-button, 
-.action-btn, 
-.game-input, 
+button,
+.action-btn,
+.game-input,
 input[type="text"],
 .btn-restart-simple,
 .btn-result-orange {
   font-family: 'Lalezar', system-ui !important;
   letter-spacing: 0.5px; /* خط Lalezar حروفه متماسكة، بنوسعها سنة صغيرة */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* الأسئلة (h2) والعناوين (h1, h3) -> تاخد خط Changa */
@@ -171,8 +173,8 @@ html, body {
 /* --- 5. شبكة اللاعبين --- */
 .mini-players-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px 10px;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 15px 10px;
   padding: 10px;
 }
 
@@ -231,6 +233,10 @@ html, body {
   cursor: pointer;
   border: 2px solid transparent;
   box-shadow: 0 2px 0 #F57F17;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  user-select: none;
 }
 
 .cat-btn-style.active {
@@ -994,19 +1000,39 @@ html, body {
 /* البار الملون (مستطيل) */
 .score-bar-fill {
   height: 100%;
-  background-color: #009688; /* تركواز */
-  
-  /* 👇 تعديل الحواف لتكون مستطيلة (مع نعومة بسيطة جداً) */
-  border-radius: 4px; 
-  
+  background: linear-gradient(
+    90deg,
+    #009688 0%,
+    #00bfa5 40%,
+    #4dd0c8 50%,
+    #00bfa5 60%,
+    #009688 100%
+  );
+  background-size: 200% 100%;
+  animation: barShimmer 2.5s ease-in-out infinite;
+
+  border-radius: 4px;
+
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding-right: 15px;
-  
+
   transition: width 1s ease-out;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.1); /* ظل خفيف تحت البار */
+  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
   min-width: 40px;
+}
+
+.score-bar-fill.negative {
+  background: linear-gradient(
+    90deg,
+    #c62828 0%,
+    #ef5350 40%,
+    #ff8a80 50%,
+    #ef5350 60%,
+    #c62828 100%
+  );
+  background-size: 200% 100%;
 }
 
 /* رقم النقاط */
@@ -1767,6 +1793,12 @@ body {
 @keyframes growBarElastic {
   0% { width: 0 !important; }
   100% { /* العرض النهائي بيتحدد في الـ style */ }
+}
+
+/* حركة لمعان مستمرة على البار */
+@keyframes barShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
 /* 3. حركة الرقم (يكبر ويصغر) */

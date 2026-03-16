@@ -19,7 +19,17 @@ export const categoriesList = [
   { id: 'currency', name: 'عملات الدول ' },
   { id: 'car_logos', name: 'شعارات سيارات ' },
   { id: 'general', name: 'معلومات عامة ' },
-  { id : 'kuwait', name: 'الكويت ' }
+  { id: 'kuwait', name: 'الكويت ' },
+  { id: 'movies', name: 'أفلام عربية وعالمية ' },
+  { id: 'geography', name: 'جغرافيا ' },
+  { id: 'food', name: 'أكلات ومطبخ ' },
+  { id: 'sports', name: 'رياضات متنوعة ' },
+  { id: 'music', name: 'موسيقى وفنانين ' },
+  { id: 'inventions', name: 'اختراعات واكتشافات ' },
+  { id: 'languages', name: 'لغات العالم ' },
+  { id: 'mythology', name: 'أساطير وحضارات ' },
+  { id: 'technology', name: 'تكنولوجيا ' },
+  { id: 'uae', name: 'الإمارات ' }
 ];
 
 export const getCategoryName = (id) => {

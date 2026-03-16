@@ -42,6 +42,11 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
     if(onUpdateSettings) onUpdateSettings({ timePerRound: val });
   };
 
+  const changeRounds = (e) => {
+    const val = Math.max(1, Math.min(35, parseInt(e.target.value) || 1));
+    if(onUpdateSettings) onUpdateSettings({ totalRounds: val });
+  };
+
   return (
     <div className="full-screen-container scrollable">
       
@@ -97,27 +102,21 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
 
       {/* 2. قسم اللاعبين (تمت استعادته ✅) */}
       <h2 className="section-title">اللاعبين</h2>
-      <InfoBox 
-        badge={`${players.length}/6`}
-        isOpen={sections.players} 
+      <InfoBox
+        badge={`${players.length}`}
+        isOpen={sections.players}
         onToggle={() => toggleSection('players')}
       >
         <div className="mini-players-grid">
           {players.map((p) => (
             <div key={p.id || Math.random()} className="mini-player">
-              <img 
-                src={`/avatars/${p.avatarId}.png`} 
-                alt="p" 
-                onError={(e) => e.target.src = '/avatars/1.png'} 
+              <img
+                src={`/avatars/${p.avatarId}.png`}
+                alt="p"
+                onError={(e) => e.target.src = '/avatars/1.png'}
               />
               <span className="player-name-tag">{p.username}</span>
             </div>
-          ))}
-          {/* خانات فارغة لإكمال الشكل */}
-          {Array.from({ length: Math.max(0, 6 - players.length) }).map((_, i) => (
-             <div key={`empty-${i}`} className="mini-player empty-slot">
-               <div className="empty-circle"></div>
-             </div>
           ))}
         </div>
       </InfoBox>
@@ -151,9 +150,9 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
         <div className="settings-row">
           <span style={{fontWeight:'bold', color:'#E65100'}}>مدة الجولة:</span>
           <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
-             <input 
-              type="number" 
-              value={settings?.timePerRound || 45} 
+             <input
+              type="number"
+              value={settings?.timePerRound || 45}
               onChange={changeTime}
               className="time-input-style"
               disabled={!amIHost}
@@ -161,6 +160,21 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
               max="120"
             />
             <span style={{color:'#E65100', fontWeight:'bold'}}>ثانية</span>
+          </div>
+        </div>
+        <div className="settings-row">
+          <span style={{fontWeight:'bold', color:'#E65100'}}>عدد الجولات:</span>
+          <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
+             <input
+              type="number"
+              value={settings?.totalRounds || 10}
+              onChange={changeRounds}
+              className="time-input-style"
+              disabled={!amIHost}
+              min="1"
+              max="35"
+            />
+            <span style={{color:'#E65100', fontWeight:'bold'}}>جولة</span>
           </div>
         </div>
       </InfoBox>

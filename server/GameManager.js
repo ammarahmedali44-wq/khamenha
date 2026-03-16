@@ -4,14 +4,14 @@ class GameManager {
   constructor(roomCode) {
     this.players = new Map(); 
     this.roomCode = roomCode;
-    this.MAX_PLAYERS = 6;
+    this.MAX_PLAYERS = Infinity;
     
     // متغير لتخزين التايمر الخاص بالجولة الحالية
     this.roundTimer = null; 
 
     this.gameState = {
       roundIndex: 0,
-      totalRounds: 5,
+      totalRounds: 10,
       currentQuestion: null,
       currentCategoryKey: null, // نحتاج نحفظ الفئة عشان البوت يختار منها
       fakeAnswers: new Map(),
@@ -24,6 +24,7 @@ class GameManager {
       turnPlayerId: null,
       settings: {
         timePerRound: 45,
+        totalRounds: 10,
         selectedCategories: []
       }
     };

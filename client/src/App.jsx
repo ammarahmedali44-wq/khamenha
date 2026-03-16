@@ -5,12 +5,12 @@ import LobbyScreen from './screens/LobbyScreen';
 import GameScreen from './screens/GameScreen';
 import './App.css';
 
-// استبدل السطر اللي فيه io.connect بالسطر ده:
-const socket = io.connect("https://dabbes-hom.com");
+// الاتصال بالسيرفر تلقائياً (نفس الدومين)
+const socket = io.connect(window.location.origin);
 
 // 1. مكون القائمة الجانبية (تم إصلاح الخلفية الصفراء والترتيب Z-Index)
 const HostMenu = ({ players, onClose, onKick, onResetLobby }) => {
-  const [view, setView] = useState('MAIN'); // 'MAIN' or 'KICK_LIST'
+  const [view, setView] = useState('MAIN'); // 'MAIN', 'KICK_LIST', or 'HOW_TO_PLAY'
 
   const overlayStyle = { 
     position: 'fixed', 
@@ -74,7 +74,7 @@ const HostMenu = ({ players, onClose, onKick, onResetLobby }) => {
       <div style={contentStyle} onClick={(e) => e.stopPropagation()}>
         
         <h2 style={headerStyle}>
-          {view === 'MAIN' ? 'القائمة' : 'طرد لاعب'}
+          {view === 'MAIN' ? 'القائمة' : view === 'KICK_LIST' ? 'طرد لاعب' : 'طريقة اللعب'}
         </h2>
 
         <div style={bodyStyle}>
@@ -85,16 +85,49 @@ const HostMenu = ({ players, onClose, onKick, onResetLobby }) => {
                 طرد لاعب 
               </button>
               
-              <button 
-                style={{...bigBtnStyle, backgroundColor: '#f44336', color: 'white', boxShadow: '0 4px 0 #d32f2f'}} 
+              <button style={bigBtnStyle} onClick={() => setView('HOW_TO_PLAY')}>
+                طريقة اللعب
+              </button>
+
+              <button
+                style={{...bigBtnStyle, backgroundColor: '#f44336', color: 'white', boxShadow: '0 4px 0 #d32f2f'}}
                 onClick={() => {
                     if(window.confirm("هل أنت متأكد؟ سيعود الجميع لغرفة الانتظار.")) {
                       onResetLobby(); onClose();
                     }
                 }}
               >
-                إنهاء اللعبة   
+                إنهاء اللعبة
               </button>
+            </>
+          )}
+
+          {view === 'HOW_TO_PLAY' && (
+            <>
+              <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '5px', direction: 'rtl', textAlign: 'right', lineHeight: '1.8', color: '#3E2723', fontSize: '0.95rem' }}>
+                <p style={{ fontWeight: 'bold', fontSize: '1.1rem', marginTop: 0 }}>:طريقة اللعب</p>
+                <ol style={{ paddingRight: '20px', margin: '0 0 15px 0' }}>
+                  <li>ادخل أنت وأصدقاؤك إلى اللعبة واختاروا الفئات التي تريدونها.</li>
+                  <li>سيظهر سؤال من إحدى الفئات المختارة.</li>
+                  <li>كل لاعب يجب أن يكتب إجابة خاطئة تبدو مقنعة، ولا يكتب الإجابة الصحيحة.</li>
+                  <li>ستعرض اللعبة الإجابة الصحيحة مع جميع إجابات اللاعبين.</li>
+                  <li>يختار كل لاعب إجابة واحدة يعتقد أنها الصحيحة.</li>
+                </ol>
+                <p style={{ fontWeight: 'bold', fontSize: '1.1rem', margin: '10px 0 5px 0' }}>النقاط:</p>
+                <ul style={{ paddingRight: '20px', margin: 0, listStyleType: 'none' }}>
+                  <li>✅ اختيار الإجابة الصحيحة: تحصل على نقطتين.</li>
+                  <li>🎭 إذا اختار أحد اللاعبين إجابتك التي كتبتها: تحصل على نقطة واحدة.</li>
+                  <li>👤 إذا اخترت إجابة لاعب آخر: يحصل هو على نقطة واحدة.</li>
+                  <li>❌ إذا اخترت إجابتك أنت: تخسر نقطة (-1)</li>
+                </ul>
+              </div>
+
+              <div
+                style={{ color: '#E65100', textAlign: 'center', cursor: 'pointer', textDecoration: 'underline', marginTop: '5px', fontWeight: 'bold' }}
+                onClick={() => setView('MAIN')}
+              >
+                رجوع للقائمة
+              </div>
             </>
           )}
 
@@ -180,10 +213,12 @@ function App() {
 
   const [settings, setSettings] = useState({
     timePerRound: 45,
+    totalRounds: 10,
     selectedCategories: []
   });
 
   const handleEditProfile = () => {
+    localStorage.removeItem('gameSession');
     if (socket) {
       socket.disconnect();
     }
@@ -209,17 +244,58 @@ function App() {
     const handleContextMenu = (e) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
 
-    socket.on('connect', () => { setIsConnected(true); setMyId(socket.id); });
+    socket.on('connect', () => {
+      setIsConnected(true);
+      setMyId(socket.id);
+      // Auto-rejoin if session exists within 5 minutes
+      try {
+        const session = JSON.parse(localStorage.getItem('gameSession') || '{}');
+        if (session.username && session.roomCode && session.joined) {
+          const elapsed = Date.now() - (session.timestamp || 0);
+          if (elapsed < 5 * 60 * 1000) {
+            socket.emit('join_game', {
+              username: session.username,
+              avatarId: session.avatarId,
+              codeInput: session.roomCode,
+              isJoinMode: true
+            });
+          } else {
+            localStorage.removeItem('gameSession');
+          }
+        }
+      } catch(e) {}
+    });
     socket.on('disconnect', () => setIsConnected(false));
     
-    socket.on('room_created', (data) => setRoomCode(data.code));
-    socket.on('room_info', (data) => setRoomCode(data.code));
+    socket.on('room_created', (data) => {
+      setRoomCode(data.code);
+      try {
+        const session = JSON.parse(localStorage.getItem('gameSession') || '{}');
+        session.roomCode = data.code;
+        localStorage.setItem('gameSession', JSON.stringify(session));
+      } catch(e) {}
+    });
+    socket.on('room_info', (data) => {
+      setRoomCode(data.code);
+      try {
+        const session = JSON.parse(localStorage.getItem('gameSession') || '{}');
+        session.roomCode = data.code;
+        localStorage.setItem('gameSession', JSON.stringify(session));
+      } catch(e) {}
+    });
     socket.on('error_msg', (msg) => alert(msg));
 
     socket.on('join_success', (data) => {
       if (data && data.isHost !== undefined) setIsMyHost(data.isHost);
       if (data && data.players) setPlayers(data.players);
       setGameState('LOBBY');
+      // Save session for auto-rejoin on disconnect
+      try {
+        const session = JSON.parse(localStorage.getItem('gameSession') || '{}');
+        if (session.username) {
+          localStorage.setItem('gameSession', JSON.stringify({ ...session, joined: true }));
+        }
+      } catch(e) {}
     });
 
     socket.on('update_players', (currentPlayers) => {
@@ -231,6 +307,7 @@ function App() {
     socket.on('settings_update', (newSettings) => setSettings(newSettings));
 
     socket.on('kicked_out', () => {
+      localStorage.removeItem('gameSession');
       alert("تم طردك من الغرفة بواسطة القائد");
       setGameState('WELCOME');
       setPlayers([]);
@@ -323,6 +400,14 @@ function App() {
   }, []);
 
   const handleJoinGame = (userData) => {
+    // Save session for auto-rejoin
+    localStorage.setItem('gameSession', JSON.stringify({
+      username: userData.username,
+      avatarId: userData.avatarId,
+      roomCode: userData.codeInput || '',
+      isJoinMode: userData.isJoinMode,
+      timestamp: Date.now()
+    }));
     if (userData.isJoinMode) {
         socket.emit('join_game', userData);
     } else {
@@ -343,7 +428,10 @@ function App() {
 
   const handleSubmitFake = (fakeText) => socket.emit('submit_fake_answer', fakeText);
   const handleVote = (option) => socket.emit('submit_vote', option);
-  const handleUpdateSettings = (newSettingsPart) => socket.emit('change_settings', newSettingsPart);
+  const handleUpdateSettings = (newSettingsPart) => {
+    setSettings(prev => ({ ...prev, ...newSettingsPart }));
+    socket.emit('change_settings', newSettingsPart);
+  };
 
   const handleNextRound = () => {
     const seenIds = getSeenQuestions();
@@ -423,7 +511,10 @@ function App() {
           />
           <h2 className="winner-name-text">{finalWinner.username}</h2>
           
-          <button className="btn-restart-simple" onClick={() => window.location.reload()}>
+          <button className="btn-restart-simple" onClick={() => {
+            socket.emit('reset_to_lobby');
+            setFinalWinner(null);
+          }}>
              لعب مرة أخرى ↻
           </button>
         </div>

@@ -32,11 +32,7 @@
 
   const io = new Server(server, {
     cors: {
-      origin: [
-        "https://dabbes-hom.com", // ربط موقعك الأول
-        "https://www.dabbes-hom.com", // الرابط باللغة
-        "https://khamenha.onrender.com" // لمرجع على Render
-      ],
+      origin: "*",
       methods: ["GET", "POST"]
     }
   });
@@ -359,7 +355,7 @@
       const player = newGame.getPlayer(socket.id);
       if (player) player.disconnected = false;
 
-      newGame.gameState.totalRounds = 10;
+      newGame.gameState.totalRounds = newGame.gameState.settings.totalRounds;
 
       games.set(roomCode, newGame);
       socketToRoom.set(socket.id, roomCode);
@@ -383,6 +379,12 @@
 
       if (existingPlayerEntry) {
         const [oldId, playerObj] = existingPlayerEntry;
+
+        // Clear the 5-minute disconnect timer
+        if (playerObj.disconnectTimer) {
+          clearTimeout(playerObj.disconnectTimer);
+          playerObj.disconnectTimer = null;
+        }
 
         playerObj.disconnected = false;
         playerObj.id = socket.id;
@@ -418,6 +420,10 @@
     }));
 
     socket.on('change_settings', safeHandler((newSettings, game) => {
+      if (newSettings.totalRounds !== undefined) {
+        newSettings.totalRounds = Math.max(1, Math.min(35, parseInt(newSettings.totalRounds) || 10));
+        game.gameState.totalRounds = newSettings.totalRounds;
+      }
       game.gameState.settings = { ...game.gameState.settings, ...newSettings };
       io.to(game.roomCode).emit('settings_update', game.gameState.settings);
     }));
@@ -442,12 +448,11 @@
     }));
 
     socket.on('reset_to_lobby', safeHandler((game) => {
-      const requester = game.getPlayer(socket.id);
-      if (!requester || !requester.isHost) return;
+      const savedSettings = { ...game.gameState.settings };
 
       game.resetGame();
       game.gameState.roundIndex = 0;
-      game.gameState.settings.selectedCategories = [];
+      game.gameState.settings = savedSettings;
       game.gameState.usedQuestionIds = [];
       game.gameState.clientSeenIds = [];
       game.clearRoundTimer();
@@ -461,7 +466,7 @@
       const clientSeenIds = data && data.seenIds ? data.seenIds : [];
 
       game.resetGame();
-      game.gameState.totalRounds = 10;
+      game.gameState.totalRounds = game.gameState.settings.totalRounds || 10;
       game.gameState.clientSeenIds = clientSeenIds;
 
       io.to(game.roomCode).emit('update_players', game.getAllPlayers());
@@ -568,9 +573,26 @@
         const player = game.getPlayer(socket.id);
         if (player) {
           player.disconnected = true;
+
+          // 5-minute timeout to permanently remove disconnected player
+          player.disconnectTimer = setTimeout(() => {
+            if (player.disconnected) {
+              game.removePlayer(socket.id);
+              if (game.players.size === 0) {
+                game.clearRoundTimer();
+                games.delete(game.roomCode);
+              } else {
+                io.to(game.roomCode).emit('update_players', game.getAllPlayers());
+              }
+            }
+          }, 5 * 60 * 1000); // 5 minutes
         }
 
         if (game.gameState.roundIndex === 0 && !game.gameState.currentQuestion) {
+          if (player && player.disconnectTimer) {
+            clearTimeout(player.disconnectTimer);
+            player.disconnectTimer = null;
+          }
           game.removePlayer(socket.id);
           if (game.players.size === 0) {
             game.clearRoundTimer();

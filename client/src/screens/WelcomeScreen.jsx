@@ -12,7 +12,8 @@ const WelcomeScreen = ({ onJoinGame, initialCode }) => {
   // 2. اختيار رقم عشوائي عند البداية
   const [avatarId, setAvatarId] = useState(() => Math.floor(Math.random() * TOTAL_AVATARS) + 1);
   
-  const [isJoinMode, setIsJoinMode] = useState(false); 
+  const [isJoinMode, setIsJoinMode] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   useEffect(() => {
     if (initialCode && !isJoinMode) {
@@ -77,20 +78,103 @@ const WelcomeScreen = ({ onJoinGame, initialCode }) => {
       )}
 
       {step === 2 && (
-        <div style={{width: '100%', display:'flex', flexDirection:'column', alignItems:'center'}}>
-          <img 
+        <div style={{width: '100%', display:'flex', flexDirection:'column', alignItems:'center', position: 'relative'}}>
+          <button
+            onClick={() => setShowHowToPlay(true)}
+            style={{
+              position: 'fixed',
+              top: '20px',
+              left: '20px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#FF5722',
+              color: 'white',
+              border: 'none',
+              fontSize: '1.3rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              boxShadow: '0 3px 0 #D84315',
+              fontFamily: 'Lalezar, system-ui',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ؟
+          </button>
+          <img
             src={gameLogo}
-            alt="دبسهم" 
-            style={{ 
-              width: '60%', // حجم أصغر شوية في القائمة
-              maxWidth: '250px', 
-              height: 'auto', 
+            alt="دبسهم"
+            style={{
+              width: '60%',
+              maxWidth: '250px',
+              height: 'auto',
               marginBottom: '30px',
               filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.3))'
-            }} 
+            }}
           />
           <button className="menu-btn" onClick={handleCreateRoom}>إنشاء غرفة</button>
           <button className="menu-btn" onClick={handleJoinOnline}>ادخل غرفة </button>
+        </div>
+      )}
+
+      {showHowToPlay && (
+        <div
+          style={{
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+            background: 'rgba(0,0,0,0.7)', zIndex: 99999,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(5px)'
+          }}
+          onClick={() => setShowHowToPlay(false)}
+        >
+          <div
+            style={{
+              background: '#FFF9C4', width: '90%', maxWidth: '350px',
+              borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+              overflow: 'hidden', border: '4px solid #FF5722',
+              animation: 'popIn 0.3s ease-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{
+              backgroundColor: '#FF5722', color: 'white', textAlign: 'center',
+              padding: '15px', fontSize: '1.5rem', fontWeight: 'bold', margin: 0,
+              fontFamily: 'Lalezar, system-ui'
+            }}>
+              طريقة اللعب
+            </h2>
+            <div style={{ padding: '20px', direction: 'rtl', textAlign: 'right', lineHeight: '1.8', color: '#3E2723', fontSize: '0.95rem', maxHeight: '400px', overflowY: 'auto' }}>
+              <ol style={{ paddingRight: '20px', margin: '0 0 15px 0' }}>
+                <li>ادخل أنت وأصدقاؤك إلى اللعبة واختاروا الفئات التي تريدونها.</li>
+                <li>سيظهر سؤال من إحدى الفئات المختارة.</li>
+                <li>كل لاعب يجب أن يكتب إجابة خاطئة تبدو مقنعة، ولا يكتب الإجابة الصحيحة.</li>
+                <li>ستعرض اللعبة الإجابة الصحيحة مع جميع إجابات اللاعبين.</li>
+                <li>يختار كل لاعب إجابة واحدة يعتقد أنها الصحيحة.</li>
+              </ol>
+              <p style={{ fontWeight: 'bold', fontSize: '1.1rem', margin: '10px 0 5px 0' }}>النقاط:</p>
+              <ul style={{ paddingRight: '20px', margin: 0, listStyleType: 'none' }}>
+                <li>✅ اختيار الإجابة الصحيحة: تحصل على نقطتين.</li>
+                <li>🎭 إذا اختار أحد اللاعبين إجابتك التي كتبتها: تحصل على نقطة واحدة.</li>
+                <li>👤 إذا اخترت إجابة لاعب آخر: يحصل هو على نقطة واحدة.</li>
+                <li>❌ إذا اخترت إجابتك أنت: تخسر نقطة (-1)</li>
+              </ul>
+            </div>
+            <div style={{ padding: '15px', display: 'flex', justifyContent: 'center' }}>
+              <button
+                style={{
+                  backgroundColor: '#009688', color: 'white', border: 'none', padding: '12px',
+                  width: '100%', borderRadius: '10px', fontWeight: 'bold',
+                  cursor: 'pointer', boxShadow: '0 4px 0 #00796B', fontFamily: 'Lalezar, system-ui',
+                  fontSize: '1.1rem'
+                }}
+                onClick={() => setShowHowToPlay(false)}
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
