@@ -342,7 +342,13 @@ function App() {
       setGameState('GAME');
       setGamePhase('WRITING');
       setRoundData(data);
-      
+
+      // Preload question image for fast display
+      if (data.img) {
+        const preloadImg = new Image();
+        preloadImg.src = data.img;
+      }
+
       // حل مشكلة تكرار الكتابة: التأكد من قائمة المسلمين
       if (data.submittedIds && data.submittedIds.includes(socket.id)) {
          setHasSubmittedAnswer(true);

@@ -154,11 +154,14 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             </h3>
 
             {roundData.img && (
-              <div style={{margin: '10px auto', width: '200px', height: '200px'}}>
-                <img 
-                  src={roundData.img} 
-                  alt="Question" 
-                  style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: '' }} 
+              <div style={{margin: '10px auto', width: '220px', height: '220px', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#f5f5f5'}}>
+                <img
+                  src={roundData.img}
+                  alt="Question"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </div>
             )}

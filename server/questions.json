@@ -22331,69 +22331,261 @@
   "girls": [
     {
       "id": "gr1",
-      "q": "ما اسم هذه الماركة؟",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
       "a": "Boucheron",
       "img": "/q-images/girls/boucheron.jfif"
     },
     {
       "id": "gr2",
-      "q": "ما اسم هذا العطر؟",
+      "q": "ما اسم هذا العطر؟ (انجليزي)",
       "a": "Good Girl",
       "img": "/q-images/girls/good-girl.jfif"
     },
     {
       "id": "gr3",
-      "q": "ما اسم هذه الماركة؟",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
+      "a": "Hermes",
+      "img": "/q-images/girls/hermes.jfif"
+    },
+    {
+      "id": "gr4",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
       "a": "NYX",
       "img": "/q-images/girls/nyx.jfif"
     },
     {
-      "id": "gr4",
-      "q": "ما اسم هذه الماركة؟",
+      "id": "gr5",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
       "a": "Piaget",
       "img": "/q-images/girls/piaget.jfif"
     },
     {
-      "id": "gr5",
-      "q": "ما اسم هذه الماركة؟",
+      "id": "gr6",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
       "a": "Clarins",
       "img": "/q-images/girls/clarins.jfif"
     },
     {
-      "id": "gr6",
-      "q": "ما اسم هذه الماركة؟",
+      "id": "gr7",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
       "a": "Kosas",
       "img": "/q-images/girls/kosas.jfif"
     },
     {
-      "id": "gr7",
-      "q": "ما اسم هذه الماركة؟",
+      "id": "gr8",
+      "q": "ما اسم هذه الماركة؟ (انجليزي)",
       "a": "Makeup Forever",
       "img": "/q-images/girls/makeup-forever.jfif"
     },
     {
-      "id": "gr8",
-      "q": "ما اسم هذه الحقيبة؟",
+      "id": "gr9",
+      "q": "ما اسم هذه الحقيبة؟ (انجليزي)",
       "a": "Neverfull",
       "img": "/q-images/girls/neverfull.jfif"
     },
     {
-      "id": "gr9",
-      "q": "ما اسم هذه الماركة؟",
+      "id": "gr10",
+      "q": "ما اسم هذه الماركة؟ (عربي)",
       "a": "لانكوم",
       "img": "/q-images/girls/lancome.jfif"
     },
     {
-      "id": "gr10",
-      "q": "ما اسم الدرجة الناقصة؟",
+      "id": "gr11",
+      "q": "ما اسم الدرجة الناقصة؟ (انجليزي)",
       "a": "Dusty Rose",
       "img": "/q-images/girls/dusty-rose.jfif"
     },
     {
-      "id": "gr11",
-      "q": "ما الحيوان الذي يرمز إلى هذه العلامة؟",
+      "id": "gr12",
+      "q": "ما اسم هذه الوردة؟ (عربي)",
+      "a": "لافندر",
+      "img": "/q-images/girls/lavender.jfif"
+    },
+    {
+      "id": "gr13",
+      "q": "ما اسم هذه الوردة؟ (انجليزي)",
+      "a": "Sunflower",
+      "img": "/q-images/girls/sunflower.jfif"
+    },
+    {
+      "id": "gr14",
+      "q": "ما الحيوان الذي يرمز إلى هذه العلامة؟ (عربي)",
       "a": "الحصان",
       "img": "/q-images/girls/horse-brand.jfif"
+    },
+    {
+      "id": "gr15",
+      "q": "ما هو اسم العلامة التجارية التي تصنع هذا المنتج؟ (انجليزي)",
+      "a": "Bourjois",
+      "img": "/q-images/girls/bourjois.jfif"
+    },
+    {
+      "id": "gr16",
+      "q": "ما هو اسم العلامة التجارية التي تصنع هذا المنتج؟ (عربي)",
+      "a": "عبدالصمد القرشي",
+      "img": "/q-images/girls/abdulsamad.jfif"
+    },
+    {
+      "id": "gr17",
+      "q": "ما هو اسم العلامة التجارية لهذا المنتج؟ (انجليزي)",
+      "a": "Christian Dior",
+      "img": "/q-images/girls/dior.jfif"
+    },
+    {
+      "id": "gr18",
+      "q": "ما هو اسم العلامة التجارية لهذا المنتج؟ (انجليزي)",
+      "a": "I Glow Beauty",
+      "img": "/q-images/girls/iglow.jfif"
+    },
+    {
+      "id": "gr19",
+      "q": "ما هو اسم العلامة التجارية لهذا المنتج؟ (انجليزي)",
+      "a": "Kiko Milano",
+      "img": "/q-images/girls/kiko.jfif"
+    },
+    {
+      "id": "gr20",
+      "q": "ما هو اسم هذا الكولكشن من العلامة التجارية شوميه؟ (انجليزي)",
+      "a": "Bee My Love",
+      "img": "/q-images/girls/bee-my-love.jfif"
+    },
+    {
+      "id": "gr21",
+      "q": "ما هو اسم هذا المنتج من Glow Recipe؟ (انجليزي)",
+      "a": "Hue Drops",
+      "img": "/q-images/girls/hue-drops.jfif"
+    },
+    {
+      "id": "gr22",
+      "q": "ما هي الشركة المصنعة لهذا المنتج الخاص بالمكياج؟ (عربي)",
+      "a": "دوز اوف كلرز",
+      "img": "/q-images/girls/dose-of-colors.jfif"
+    },
+    {
+      "id": "gr23",
+      "q": "ما هي الشركة المصنعة لهذا المنتج الخاص بالمكياج؟ (عربي)",
+      "a": "كريستيان لوبوتين",
+      "img": "/q-images/girls/louboutin.jfif"
+    },
+    {
+      "id": "gr24",
+      "q": "ما هي العلامة التجارية التي تصنع هذا المنتج؟ (انجليزي)",
+      "a": "Charlotte Tilbury",
+      "img": "/q-images/girls/charlotte-tilbury.jfif"
+    },
+    {
+      "id": "gr25",
+      "q": "ما هي العلامة التجارية التي تصنع هذا المنتج؟ (انجليزي)",
+      "a": "Fenty Beauty",
+      "img": "/q-images/girls/fenty.jfif"
+    },
+    {
+      "id": "gr26",
+      "q": "ما هي العلامة التجارية التي تصنع هذا المنتج؟ (انجليزي)",
+      "a": "MAC",
+      "img": "/q-images/girls/mac.jfif"
+    },
+    {
+      "id": "gr27",
+      "q": "ما هي العلامة التجارية التي تصنع هذه الساعة؟ (انجليزي)",
+      "a": "Chopard",
+      "img": "/q-images/girls/chopard.jfif"
+    },
+    {
+      "id": "gr28",
+      "q": "ما هي العلامة التجارية التي تصنع هذه الساعة؟ (انجليزي)",
+      "a": "Piaget",
+      "img": "/q-images/girls/piaget-watch.jfif"
+    },
+    {
+      "id": "gr29",
+      "q": "ما هي العلامة التجارية الفاخرة التي تشتهر بحقائب بيركين وكيلي؟ (عربي)",
+      "a": "هيرميس",
+      "img": "/q-images/girls/hermes-bags.jfif"
+    },
+    {
+      "id": "gr30",
+      "q": "ما هي العلامة التجارية لهذا الباليت؟ (عربي)",
+      "a": "هدى بيوتي",
+      "img": "/q-images/girls/huda-beauty.jfif"
+    },
+    {
+      "id": "gr31",
+      "q": "ما هي العلامة التجارية لهذا الحذاء؟ (انجليزي)",
+      "a": "DKNY",
+      "img": "/q-images/girls/dkny.jfif"
+    },
+    {
+      "id": "gr32",
+      "q": "ما هي العلامة التجارية لهذا المنتج؟ (انجليزي)",
+      "a": "Pixi",
+      "img": "/q-images/girls/pixi.jfif"
+    },
+    {
+      "id": "gr33",
+      "q": "ما هي العلامة التجارية لهذا المنتج؟ (عربي)",
+      "a": "جيفنشي",
+      "img": "/q-images/girls/givenchy.jfif"
+    },
+    {
+      "id": "gr34",
+      "q": "ما هي العلامة التجارية لهذا المنتج؟ (عربي)",
+      "a": "شانيل",
+      "img": "/q-images/girls/chanel-product.jfif"
+    },
+    {
+      "id": "gr35",
+      "q": "ما هي العلامة التجارية لهذا المنتج؟ (انجليزي)",
+      "a": "Pastel",
+      "img": "/q-images/girls/pastel.jfif"
+    },
+    {
+      "id": "gr36",
+      "q": "ما هي العلامة التجارية لهذا المنتج؟ (انجليزي)",
+      "a": "Patrick Ta",
+      "img": "/q-images/girls/patrick-ta.jfif"
+    },
+    {
+      "id": "gr37",
+      "q": "ما هي العلامة التجارية لهذا المنتج؟ (عربي)",
+      "a": "دايسون",
+      "img": "/q-images/girls/dyson.jfif"
+    },
+    {
+      "id": "gr38",
+      "q": "ما هي العلامة التجارية لهذه العلبة؟ (انجليزي)",
+      "a": "By Fouz",
+      "img": "/q-images/girls/by-fouz.jfif"
+    },
+    {
+      "id": "gr39",
+      "q": "ما هي ماركة هذا الخاتم؟ (انجليزي)",
+      "a": "De Beers",
+      "img": "/q-images/girls/de-beers.jfif"
+    },
+    {
+      "id": "gr40",
+      "q": "ما هي ماركة هذه الحقيبة؟ (انجليزي)",
+      "a": "Valentino Garavani",
+      "img": "/q-images/girls/valentino.jfif"
+    },
+    {
+      "id": "gr41",
+      "q": "ماهو الاسم الحقيقي للمغنية فيروز؟ (عربي)",
+      "a": "نهاد",
+      "img": "/q-images/girls/fairouz.jfif"
+    },
+    {
+      "id": "gr42",
+      "q": "ماهي العلامة التجارية التي تصنّع هذا الحذاء؟ (انجليزي)",
+      "a": "Sophia Webster",
+      "img": "/q-images/girls/sophia-webster.jfif"
+    },
+    {
+      "id": "gr43",
+      "q": "ماهي العلامة التجارية التي تصنّع هذا المنتج؟ (انجليزي)",
+      "a": "Chanel",
+      "img": "/q-images/girls/chanel.jfif"
     }
   ]
 }
