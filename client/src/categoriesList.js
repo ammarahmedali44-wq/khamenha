@@ -29,7 +29,8 @@ export const categoriesList = [
   { id: 'languages', name: 'لغات العالم ' },
   { id: 'mythology', name: 'أساطير وحضارات ' },
   { id: 'technology', name: 'تكنولوجيا ' },
-  { id: 'uae', name: 'الإمارات ' }
+  { id: 'uae', name: 'الإمارات ' },
+  { id: 'girls', name: 'لمة بنات ' }
 ];
 
 export const getCategoryName = (id) => {
