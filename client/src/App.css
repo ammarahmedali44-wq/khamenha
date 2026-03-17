@@ -954,24 +954,25 @@ html, body {
 /* الأفاتار (بدون دائرة) */
 .score-avatar-wrapper {
   width: 60px;
-  height: 60px;
+  min-height: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   z-index: 10;
   margin-bottom: 5px; /* رفع بسيط */
+  position: relative;
 }
 
 .score-avatar-img {
-  width: 100%;
-  height: 100%;
+  width: 55px;
+  height: 55px;
   object-fit: contain;
-  background: transparent; /* ❌ إلغاء الخلفية البيضاء */
-  border: none; /* ❌ إلغاء الإطار */
-  border-radius: 0; /* ❌ إلغاء التدوير */
-  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); /* ظل للشخصية نفسها */
-  transform: scale(1.3); /* تكبير الشخصية شوية عشان تملى المكان */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+  flex-shrink: 0;
 }
 
 /* اسم اللاعب */
@@ -979,13 +980,14 @@ html, body {
   font-size: 0.75rem;
   font-weight: bold;
   color: #5D4037;
-  position: absolute;
-  bottom: 0;
-  background: rgba(255,255,255,0.8); /* خلفية خفيفة للاسم عشان يبان */
+  position: relative;
+  margin-top: 4px;
+  background: transparent;
   padding: 0 5px;
   border-radius: 4px;
   box-shadow: none;
   border: none;
+  white-space: nowrap;
 }
 
 /* مسار البار */
