@@ -107,6 +107,16 @@
       };
     };
 
+    // Helper: get players who actively participate (exclude host in TV mode)
+    const getActivePlayers = (game) => {
+      const tvMode = game.gameState.settings.tvMode;
+      return game.getAllPlayers().filter(p => {
+        if (p.disconnected) return false;
+        if (tvMode && p.isHost) return false;
+        return true;
+      });
+    };
+
     const sendRoundResults = (game) => {
       const optionsMap = new Map();
       const realAns = game.gameState.currentQuestion.a;
@@ -253,8 +263,9 @@
       const categoryKey = game.gameState.currentCategoryKey;
       const categoryQuestions = allQuestionsWithIds[categoryKey] || [];
 
+      const tvMode = game.gameState.settings.tvMode;
       game.players.forEach(player => {
-        if (!game.gameState.fakeAnswers.has(player.id) && !player.disconnected) {
+        if (!game.gameState.fakeAnswers.has(player.id) && !player.disconnected && !(tvMode && player.isHost)) {
           let randomBotAnswer = "لا يوجد إجابة";
           if (categoryQuestions.length > 0) {
             const otherQuestions = categoryQuestions.filter(q => q.id !== game.gameState.currentQuestion.id);
@@ -319,7 +330,7 @@
         }
       }
 
-      const playersArr = game.getAllPlayers().filter(p => !p.disconnected);
+      const playersArr = getActivePlayers(game);
       if (playersArr.length === 0) return;
 
       const turnPlayerIndex = game.gameState.roundIndex % playersArr.length;
@@ -500,6 +511,10 @@
     }));
 
     socket.on('submit_fake_answer', safeHandler((fakeText, game) => {
+      // Block host from participating in TV mode
+      const hostPlayer = game.getPlayer(socket.id);
+      if (game.gameState.settings.tvMode && hostPlayer && hostPlayer.isHost) return;
+
       const cleanFake = normalizeArabic(fakeText);
       const cleanReal = normalizeArabic(game.gameState.currentQuestion.a || "");
 
@@ -519,7 +534,8 @@
 
       socket.emit('submit_success');
 
-      if (game.gameState.fakeAnswers.size >= game.players.size) {
+      const activeCount = getActivePlayers(game).length;
+      if (game.gameState.fakeAnswers.size >= activeCount) {
         finalizeWritingPhase(game);
       }
     }));
@@ -527,6 +543,8 @@
     socket.on('submit_vote', safeHandler((selectedOption, game) => {
       const voter = game.getPlayer(socket.id);
       if (!voter) return;
+      // Block host from voting in TV mode
+      if (game.gameState.settings.tvMode && voter.isHost) return;
 
       game.gameState.votes.set(socket.id, selectedOption);
       const votedIds = Array.from(game.gameState.votes.keys());
@@ -536,7 +554,8 @@
         votedIds: votedIds
       });
 
-      if (game.gameState.votes.size >= game.players.size) {
+      const activeVoterCount = getActivePlayers(game).length;
+      if (game.gameState.votes.size >= activeVoterCount) {
         game.clearRoundTimer();
         sendRoundResults(game);
       }

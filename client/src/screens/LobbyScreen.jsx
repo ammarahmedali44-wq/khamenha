@@ -20,6 +20,7 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
   const amIHost = isHostOverride;
   // حالة الأقسام (باركود، لاعبين، فئات، إعدادات)
   const [sections, setSections] = useState({ qr: true, players: true, categories: true, settings: true });
+  const [showTvQR, setShowTvQR] = useState(false);
   const toggleSection = (s) => setSections(prev => ({ ...prev, [s]: !prev[s] }));
 
   // استخدام القائمة المستوردة
@@ -183,13 +184,53 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
             <input
               type="checkbox"
               checked={settings?.tvMode || false}
-              onChange={(e) => amIHost && onUpdateSettings({ tvMode: e.target.checked })}
+              onChange={(e) => {
+                if (!amIHost) return;
+                const newVal = e.target.checked;
+                onUpdateSettings({ tvMode: newVal });
+                if (newVal) setShowTvQR(true);
+              }}
               disabled={!amIHost}
             />
             <span className="toggle-slider"></span>
           </label>
         </div>
       </InfoBox>
+
+      {/* TV Mode QR Code Popup */}
+      {showTvQR && settings?.tvMode && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(0,0,0,0.85)', zIndex: 99999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(8px)'
+        }}>
+          <button onClick={() => setShowTvQR(false)} style={{
+            position: 'absolute', top: '25px', left: '25px',
+            background: '#f44336', color: 'white', border: 'none',
+            width: '50px', height: '50px', borderRadius: '50%',
+            fontSize: '1.8rem', fontWeight: 'bold', cursor: 'pointer',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.3)', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', zIndex: 100000
+          }}>✕</button>
+          <h2 style={{color: '#FFD700', fontSize: '2.5rem', marginBottom: '30px', fontWeight: '900', textShadow: '0 2px 4px rgba(0,0,0,0.5)'}}>
+            امسح للانضمام
+          </h2>
+          <div style={{background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 40px rgba(0,0,0,0.4)'}}>
+            <QRCode value={`${window.location.origin}/?room=${roomCode}`} size={280} />
+          </div>
+          <p style={{
+            color: 'white', fontSize: '3rem', fontWeight: '900',
+            letterSpacing: '8px', fontFamily: 'monospace', marginTop: '25px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+          }}>
+            {roomCode}
+          </p>
+          <p style={{color: '#aaa', fontSize: '1.2rem', marginTop: '10px'}}>
+            وضع التلفاز مفعل - القائد يعرض فقط
+          </p>
+        </div>
+      )}
 
       <div style={{marginTop: '20px', marginBottom: '50px'}}>
         {amIHost ? (
