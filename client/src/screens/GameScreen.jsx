@@ -61,7 +61,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             transition: 'all 0.3s'
           }}>
             <img src={`/avatars/${p.avatarId}.png`} alt="p" style={{width: isTvDisplay ? '70px' : '45px', height: isTvDisplay ? '70px' : '45px', borderRadius: '0', objectFit: 'contain'}} onError={(e) => e.target.src = '/avatars/1.png'}/>
-            <span style={{fontSize: isTvDisplay ? '1.1rem' : '0.8rem', fontWeight: 'bold', color: '#3E2723', marginTop: '-5px'}}>{p.username}</span>
+            <span style={{fontSize: isTvDisplay ? '1.1rem' : '0.8rem', fontWeight: 'bold', color: '#3E2723', marginTop: '5px'}}>{p.username}</span>
           </div>
         );
       })}
