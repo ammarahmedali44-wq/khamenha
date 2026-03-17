@@ -5,6 +5,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   const [fakeAnswer, setFakeAnswer] = useState("");
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
   const [fixedWinner, setFixedWinner] = useState(null);
+  const [zoomedImg, setZoomedImg] = useState(null);
 
   // TV mode: host = TV display, players = phone controls
   const isTvDisplay = tvMode && isHost;
@@ -146,6 +147,8 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     // TV Display: show question big, waiting for players
     if (isTvDisplay) {
       return (
+        <>
+        <ImageZoomOverlay src={zoomedImg} onClose={() => setZoomedImg(null)} />
         <div className={`full-screen-container${tvClass}`} style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
           <div className="timer-bar-container" style={{width: '100%', height: '15px', backgroundColor: '#eee', position: 'absolute', top: 0, left: 0}}>
             <div className="timer-bar-fill" key={`writing-tv-${roundData?.roundNumber}`} style={{
@@ -159,7 +162,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
               {getCategoryName(roundData.categoryKey)}
             </h3>
             {roundData.img && (
-              <div style={{margin: '15px auto', width: '400px', height: '400px', borderRadius: '15px', overflow: 'hidden', backgroundColor: '#f5f5f5'}}>
+              <div onClick={() => setZoomedImg(roundData.img)} style={{margin: '15px auto', width: '400px', height: '400px', overflow: 'hidden', backgroundColor: 'transparent', cursor: 'pointer'}}>
                 <img src={roundData.img} alt="Question" loading="eager" decoding="async" fetchpriority="high" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
               </div>
             )}
@@ -174,11 +177,14 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
           </div>
           {renderPlayerStatus(submittedIds, 'submit')}
         </div>
+        </>
       );
     }
 
     // Normal / TV Player: show question + input
     return (
+      <>
+      <ImageZoomOverlay src={zoomedImg} onClose={() => setZoomedImg(null)} />
       <div className="full-screen-container" style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
         <div className="timer-bar-container" style={{width: '100%', height: '10px', backgroundColor: '#eee', position: 'absolute', top: 0, left: 0}}>
           <div className="timer-bar-fill" key={`writing-${roundData?.roundNumber}`} style={{
@@ -192,7 +198,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             {getCategoryName(roundData.categoryKey)}
           </h3>
           {roundData.img && (
-            <div style={{margin: '10px auto', width: '220px', height: '220px', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#f5f5f5'}}>
+            <div onClick={() => setZoomedImg(roundData.img)} style={{margin: '10px auto', width: '220px', height: '220px', overflow: 'hidden', backgroundColor: 'transparent', cursor: 'pointer'}}>
               <img src={roundData.img} alt="Question" loading="eager" decoding="async" fetchpriority="high" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
             </div>
           )}
@@ -215,6 +221,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
         </div>
         {!isTvPlayer && renderPlayerStatus(submittedIds, 'submit')}
       </div>
+      </>
     );
   }
 
@@ -455,6 +462,28 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   }
 
   return null;
+};
+
+const ImageZoomOverlay = ({ src, onClose }) => {
+  if (!src) return null;
+  return (
+    <div onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999,
+      display: 'flex', alignItems: 'center', justifyContent: 'center'
+    }}>
+      <button onClick={(e) => { e.stopPropagation(); onClose(); }} style={{
+        position: 'absolute', top: '15px', left: '15px',
+        background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white',
+        fontSize: '2rem', width: '50px', height: '50px', borderRadius: '50%',
+        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 10000
+      }}>✕</button>
+      <img src={src} alt="Zoomed" style={{
+        maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain'
+      }} onClick={(e) => e.stopPropagation()} />
+    </div>
+  );
 };
 
 export default GameScreen;
