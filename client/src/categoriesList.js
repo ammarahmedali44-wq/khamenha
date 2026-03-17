@@ -29,7 +29,8 @@ export const categoriesList = [
   { id: 'languages', name: 'لغات العالم ' },
   { id: 'mythology', name: 'أساطير وحضارات ' },
   { id: 'technology', name: 'تكنولوجيا ' },
-  { id: 'girls', name: 'لمة بنات ' }
+  { id: 'girls', name: 'لمة بنات ' },
+  { id: 'player_career', name: 'مسيرة لاعب كرة ' }
 ];
 
 export const getCategoryName = (id) => {
