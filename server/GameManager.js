@@ -25,7 +25,8 @@ class GameManager {
       settings: {
         timePerRound: 45,
         totalRounds: 10,
-        selectedCategories: []
+        selectedCategories: [],
+        tvMode: false
       }
     };
     

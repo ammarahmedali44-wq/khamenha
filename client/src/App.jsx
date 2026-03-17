@@ -494,19 +494,20 @@ function App() {
       )}
       
       {gameState === 'GAME' && roundData && (
-        <GameScreen 
+        <GameScreen
           phase={gamePhase}
           roundData={roundData}
           players={players}
           settings={settings}
-          onSubmitFake={handleSubmitFake} 
+          onSubmitFake={handleSubmitFake}
           onVote={handleVote}
-          onSelectCategory={handleSelectCategory} 
+          onSelectCategory={handleSelectCategory}
           myId={myId}
           hasSubmitted={hasSubmittedAnswer}
-          isHost={isMyHost} 
+          isHost={isMyHost}
           onNextRound={handleNextRound}
           onShowScoreboard={handleShowScoreboard}
+          tvMode={settings?.tvMode || false}
         />
       )}
 

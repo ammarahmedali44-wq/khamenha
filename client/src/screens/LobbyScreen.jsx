@@ -177,6 +177,18 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
             <span style={{color:'#E65100', fontWeight:'bold'}}>جولة</span>
           </div>
         </div>
+        <div className="settings-row">
+          <span style={{fontWeight:'bold', color:'#E65100'}}>وضع التلفاز:</span>
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={settings?.tvMode || false}
+              onChange={(e) => amIHost && onUpdateSettings({ tvMode: e.target.checked })}
+              disabled={!amIHost}
+            />
+            <span className="toggle-slider"></span>
+          </label>
+        </div>
       </InfoBox>
 
       <div style={{marginTop: '20px', marginBottom: '50px'}}>
