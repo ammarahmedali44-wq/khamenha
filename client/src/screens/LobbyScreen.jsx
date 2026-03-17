@@ -116,7 +116,7 @@ const LobbyScreen = ({ players = [], onStartGame, roomCode, isHostOverride, sett
                 alt="p"
                 onError={(e) => e.target.src = '/avatars/1.png'}
               />
-              <span className="player-name-tag">{p.username}</span>
+              <span className="player-name-tag">{p.username}{p.isHost ? ' (المنظم)' : ''}</span>
             </div>
           ))}
         </div>

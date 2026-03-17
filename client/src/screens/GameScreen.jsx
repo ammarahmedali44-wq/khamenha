@@ -10,6 +10,9 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   const isTvDisplay = tvMode && isHost;
   const isTvPlayer = tvMode && !isHost;
   const tvClass = isTvDisplay ? ' tv-mode' : '';
+  // Active players count (exclude host in TV mode)
+  const activePlayers = tvMode ? players.filter(p => !p.isHost) : players;
+  const activeCount = activePlayers.length;
 
   useEffect(() => {
     if (phase === 'GAME_OVER' && players.length > 0 && !fixedWinner) {
@@ -44,9 +47,11 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   );
 
   // Player status bar (shows who submitted/voted)
-  const renderPlayerStatus = (statusIds, checkField) => (
+  const renderPlayerStatus = (statusIds, checkField) => {
+    const displayPlayers = isTvDisplay ? activePlayers : players;
+    return (
     <div style={{display: 'flex', gap: isTvDisplay ? '25px' : '15px', justifyContent: 'center', paddingBottom: '20px', width: '100%', flexWrap: 'wrap'}}>
-      {players.map(p => {
+      {displayPlayers.map(p => {
         const isFinished = statusIds.includes(p.id) || (checkField === 'submit' && p.id === myId && hasSubmitted);
         return (
           <div key={p.id} style={{
@@ -62,6 +67,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
       })}
     </div>
   );
+  };
 
   useEffect(() => {
     setFakeAnswer("");
@@ -162,7 +168,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             </h2>
             <div style={{backgroundColor: 'rgba(0,0,0,0.1)', padding: '15px 40px', borderRadius: '15px'}}>
               <p style={{color: '#5D4037', fontSize: '1.8rem', fontWeight: 'bold', margin: 0}}>
-                {submittedIds.length}/{players.length} جاوبوا
+                {submittedIds.length}/{activeCount} جاوبوا
               </p>
             </div>
           </div>
@@ -246,7 +252,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             </div>
             <div style={{backgroundColor: 'rgba(0,0,0,0.1)', padding: '15px 40px', borderRadius: '15px', marginTop: '30px'}}>
               <p style={{color: '#5D4037', fontSize: '1.8rem', fontWeight: 'bold', margin: 0}}>
-                {votedIds.length}/{players.length} صوتوا
+                {votedIds.length}/{activeCount} صوتوا
               </p>
             </div>
           </div>
