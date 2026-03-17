@@ -7,6 +7,15 @@
   const path = require('path');
   const questionsDB = require('./questions.json');
 
+  // Prevent server crashes from unhandled errors
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err.message);
+    console.error(err.stack);
+  });
+  process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection:', reason);
+  });
+
   const app = express();
 
   // 👇 التعديل: السماح بالحروف الإنجليزية والأرقام وعدم حذفها
@@ -34,7 +43,9 @@
     cors: {
       origin: "*",
       methods: ["GET", "POST"]
-    }
+    },
+    pingInterval: 25000,
+    pingTimeout: 20000
   });
 
   app.get('*', (req, res) => {
@@ -118,6 +129,7 @@
     };
 
     const sendRoundResults = (game) => {
+      if (!game || !game.gameState.currentQuestion) return;
       const optionsMap = new Map();
       const realAns = game.gameState.currentQuestion.a;
       const realAnsNorm = normalizeArabic(realAns);
@@ -626,6 +638,20 @@
   });
 
   app.use((err, req, res, next) => res.status(500).send('Something broke!'));
+
+  // Clean up abandoned games every 10 minutes
+  setInterval(() => {
+    const now = Date.now();
+    games.forEach((game, code) => {
+      const allDisconnected = game.getAllPlayers().every(p => p.disconnected);
+      if (allDisconnected && game.players.size > 0) {
+        game.clearRoundTimer();
+        games.delete(code);
+        console.log(`Cleaned up abandoned game: ${code}`);
+      }
+    });
+    console.log(`Active games: ${games.size}, Active sockets: ${io.engine.clientsCount}`);
+  }, 10 * 60 * 1000);
 
   // رجعه 5000 أو المتغير بدع السيرفر
   const PORT = process.env.PORT || 5000;
