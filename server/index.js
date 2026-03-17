@@ -49,7 +49,7 @@
 
   for (const [category, questions] of Object.entries(questionsDB)) {
     allQuestionsWithIds[category] = questions.map(q => ({
-      ...q, text: q.text || q.q || "سؤال فارغ", id: q.id || `gen_${globalIdCounter++}`
+      ...q, text: q.text || q.q || "سؤال فارغ", img: q.img || q.image || null, id: q.id || `gen_${globalIdCounter++}`
     }));
   }
 
