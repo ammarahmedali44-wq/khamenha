@@ -381,7 +381,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   // ========== 5. SCOREBOARD ==========
   if (phase === 'SCOREBOARD') {
     const allScoreboardPlayers = roundData.players || [];
-    const sortedPlayers = (isTvDisplay ? allScoreboardPlayers.filter(p => !p.isHost) : allScoreboardPlayers).sort((a, b) => b.score - a.score);
+    const sortedPlayers = (tvMode ? allScoreboardPlayers.filter(p => !p.isHost) : allScoreboardPlayers).sort((a, b) => b.score - a.score);
     const totalRounds = roundData.totalRounds || 10;
     const scaleMax = Math.max(totalRounds * 3, 10);
     const ROW_HEIGHT = isTvDisplay ? 130 : 110;
