@@ -534,7 +534,8 @@ function App() {
           {/* Top 3 Podium */}
           <div className="podium-container">
             {(() => {
-              const sorted = [...players].sort((a, b) => b.score - a.score);
+              const activePlayers = settings?.tvMode ? players.filter(p => !p.isHost) : players;
+              const sorted = [...activePlayers].sort((a, b) => b.score - a.score);
               const top3 = sorted.slice(0, 3);
               const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3.length >= 2 ? [top3[1], top3[0]] : [top3[0]];
               const podiumHeights = top3.length >= 3 ? [140, 190, 100] : top3.length >= 2 ? [140, 190] : [190];
