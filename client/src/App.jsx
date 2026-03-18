@@ -529,21 +529,21 @@ function App() {
             ))}
           </div>
 
-          <h1 className="winner-title-text" style={{animation: 'bounceIn 0.8s ease-out'}}>🏆 الفائز 🏆</h1>
+          <h1 className="winner-title-text" style={{animation: 'bounceIn 0.8s ease-out'}}>الفائز</h1>
 
           {/* Top 3 Podium */}
           <div className="podium-container">
             {(() => {
               const sorted = [...players].sort((a, b) => b.score - a.score);
               const top3 = sorted.slice(0, 3);
-              const medals = ['🥇', '🥈', '🥉'];
               const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3.length >= 2 ? [top3[1], top3[0]] : [top3[0]];
-              const podiumHeights = top3.length >= 3 ? [100, 140, 70] : top3.length >= 2 ? [100, 140] : [140];
+              const podiumHeights = top3.length >= 3 ? [140, 190, 100] : top3.length >= 2 ? [140, 190] : [190];
               const podiumRanks = top3.length >= 3 ? [1, 0, 2] : top3.length >= 2 ? [1, 0] : [0];
+              // Animation: 1st appears first (0.3s), then 2nd (0.6s), then 3rd (0.9s)
+              const animDelays = top3.length >= 3 ? [0.6, 0.3, 0.9] : top3.length >= 2 ? [0.6, 0.3] : [0.3];
 
               return podiumOrder.map((p, idx) => (
-                <div key={p.id} className="podium-player" style={{animationDelay: `${idx * 0.2 + 0.3}s`}}>
-                  <span style={{fontSize: '2.5rem'}}>{medals[podiumRanks[idx]]}</span>
+                <div key={p.id} className="podium-player" style={{animationDelay: `${animDelays[idx]}s`}}>
                   <img src={`/avatars/${p.avatarId}.png`} alt={p.username} className="podium-avatar"
                     onError={(e) => e.target.src = '/avatars/1.png'} />
                   <span className="podium-name">{p.username}</span>
@@ -553,27 +553,6 @@ function App() {
                 </div>
               ));
             })()}
-          </div>
-
-          {/* Player Stats */}
-          <div className="stats-container">
-            <h3 style={{color: '#FFD700', margin: '0 0 15px', fontSize: '1.3rem'}}>الإحصائيات</h3>
-            {players.sort((a, b) => b.score - a.score).map(p => {
-              const stats = gameStats[p.id] || {};
-              return (
-                <div key={p.id} className="stat-row" style={{flexDirection: 'column', alignItems: 'flex-end', gap: '5px'}}>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                    <img src={`/avatars/${p.avatarId}.png`} alt="" style={{width: '35px', height: '35px', objectFit: 'contain'}}
-                      onError={(e) => e.target.src = '/avatars/1.png'} />
-                    <span style={{fontWeight: 'bold', color: '#FFF'}}>{p.username}</span>
-                  </div>
-                  <div style={{display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.85rem', color: '#FFD700', alignItems: 'flex-end'}}>
-                    <span>الإجابات الصحيحه : {stats.correctAnswers || 0}/{stats.totalRounds || 0}</span>
-                    {(stats.fooledCount || 0) > 0 && <span>خدعت كام واحد : {stats.fooledCount}</span>}
-                  </div>
-                </div>
-              );
-            })}
           </div>
 
           <button className="btn-restart-simple" onClick={() => {

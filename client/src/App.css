@@ -2015,7 +2015,7 @@ body {
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 .podium-bar {
-  width: 80px;
+  width: 100px;
   background: linear-gradient(180deg, #FFD700 0%, #FFA000 100%);
   border-radius: 8px 8px 0 0;
   display: flex;
