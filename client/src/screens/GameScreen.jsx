@@ -465,7 +465,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
         </div>
         <div style={{marginTop: '20px', height: '80px'}}>
           {isHost ? (
-            <button className="action-btn" onClick={onNextRound} style={isTvDisplay ? {fontSize:'1.8rem', padding:'18px 40px'} : undefined}>الجولة التالية ➡</button>
+            <button className="action-btn" onClick={onNextRound} style={isTvDisplay ? {fontSize:'1.8rem', padding:'18px 40px'} : undefined}>{(roundData?.roundNumber || 1) >= totalRounds ? 'النتائج' : 'الجولة التالية'}</button>
           ) : (
             <p className="waiting-text waiting-pulse">القائد يراجع النتائج...</p>
           )}
