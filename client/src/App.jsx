@@ -557,20 +557,19 @@ function App() {
 
           {/* Player Stats */}
           <div className="stats-container">
-            <h3 style={{color: '#FFD700', margin: '0 0 15px', fontSize: '1.3rem'}}>📊 الإحصائيات</h3>
+            <h3 style={{color: '#FFD700', margin: '0 0 15px', fontSize: '1.3rem'}}>الإحصائيات</h3>
             {players.sort((a, b) => b.score - a.score).map(p => {
               const stats = gameStats[p.id] || {};
               return (
-                <div key={p.id} className="stat-row">
+                <div key={p.id} className="stat-row" style={{flexDirection: 'column', alignItems: 'flex-end', gap: '5px'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                     <img src={`/avatars/${p.avatarId}.png`} alt="" style={{width: '35px', height: '35px', objectFit: 'contain'}}
                       onError={(e) => e.target.src = '/avatars/1.png'} />
                     <span style={{fontWeight: 'bold', color: '#FFF'}}>{p.username}</span>
                   </div>
-                  <div style={{display: 'flex', gap: '15px', fontSize: '0.85rem', color: '#FFD700'}}>
-                    <span>✅ {stats.correctAnswers || 0}/{stats.totalRounds || 0}</span>
-                    {stats.fastestTime && <span>⚡ {stats.fastestTime}ث</span>}
-                    {(stats.fooledCount || 0) > 0 && <span>🎭 {stats.fooledCount}</span>}
+                  <div style={{display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.85rem', color: '#FFD700', alignItems: 'flex-end'}}>
+                    <span>الإجابات الصحيحه : {stats.correctAnswers || 0}/{stats.totalRounds || 0}</span>
+                    {(stats.fooledCount || 0) > 0 && <span>خدعت كام واحد : {stats.fooledCount}</span>}
                   </div>
                 </div>
               );
