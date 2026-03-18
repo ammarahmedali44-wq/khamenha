@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getCategoryName } from '../categoriesList';
 
 const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote, onSelectCategory, myId, hasSubmitted, isHost, onNextRound, onShowScoreboard, tvMode }) => {
@@ -6,6 +6,9 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
   const [fixedWinner, setFixedWinner] = useState(null);
   const [zoomedImg, setZoomedImg] = useState(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [phaseTransition, setPhaseTransition] = useState(false);
+  const prevPhaseRef = useRef(phase);
 
   // TV mode: host = TV display, players = phone controls
   const isTvDisplay = tvMode && isHost;
@@ -70,9 +73,20 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   );
   };
 
+  // Phase transition animation
+  useEffect(() => {
+    if (prevPhaseRef.current !== phase) {
+      setPhaseTransition(true);
+      const timer = setTimeout(() => setPhaseTransition(false), 50);
+      prevPhaseRef.current = phase;
+      return () => clearTimeout(timer);
+    }
+  }, [phase]);
+
   useEffect(() => {
     setFakeAnswer("");
     setSelectedOptionIndex(null);
+    setImgLoaded(false);
   }, [roundData?.question]);
 
   if (!roundData) return <div className="full-screen-container"><h1 className="waiting-text">جارِ التحميل...</h1></div>;
@@ -162,8 +176,9 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
               {getCategoryName(roundData.categoryKey)}
             </h3>
             {roundData.img && (
-              <div onClick={() => setZoomedImg(roundData.img)} style={{margin: '15px auto', width: '400px', height: '400px', overflow: 'hidden', backgroundColor: 'transparent', cursor: 'pointer'}}>
-                <img src={roundData.img} alt="Question" loading="eager" decoding="async" fetchpriority="high" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+              <div onClick={() => setZoomedImg(roundData.img)} style={{margin: '15px auto', width: '400px', height: '400px', overflow: 'hidden', backgroundColor: 'transparent', cursor: 'pointer', position: 'relative'}}>
+                {!imgLoaded && <div className="skeleton-img" style={{width: '100%', height: '100%', position: 'absolute', top: 0, left: 0}} />}
+                <img src={roundData.img} alt="Question" loading="eager" decoding="async" fetchpriority="high" onLoad={() => setImgLoaded(true)} style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.3s' }}/>
               </div>
             )}
             <h2 style={{ color: '#E65100', fontSize: '2.8rem', fontWeight: 'bold', textAlign: 'center', marginTop: '15px', marginBottom: '40px' }}>
@@ -198,8 +213,9 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             {getCategoryName(roundData.categoryKey)}
           </h3>
           {roundData.img && (
-            <div onClick={() => setZoomedImg(roundData.img)} style={{margin: '10px auto', width: '220px', height: '220px', overflow: 'hidden', backgroundColor: 'transparent', cursor: 'pointer'}}>
-              <img src={roundData.img} alt="Question" loading="eager" decoding="async" fetchpriority="high" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+            <div onClick={() => setZoomedImg(roundData.img)} style={{margin: '10px auto', width: '220px', height: '220px', overflow: 'hidden', backgroundColor: 'transparent', cursor: 'pointer', position: 'relative'}}>
+              {!imgLoaded && <div className="skeleton-img" style={{width: '100%', height: '100%', position: 'absolute', top: 0, left: 0}} />}
+              <img src={roundData.img} alt="Question" loading="eager" decoding="async" fetchpriority="high" onLoad={() => setImgLoaded(true)} style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.3s' }}/>
             </div>
           )}
           <h2 style={{ color: '#E65100', fontSize: '1.8rem', fontWeight: 'bold', textAlign: 'center', marginTop: '10px', marginBottom: '50px' }}>
@@ -216,7 +232,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
               </button>
             </div>
           ) : (
-            <div className="waiting-box"><p className="waiting-text">تم الإرسال! </p></div>
+            <div className="waiting-box waiting-pulse"><p className="waiting-text">تم الإرسال! ✅</p><p style={{color:'#888', fontSize:'0.9rem', margin:0}}>في انتظار باقي اللاعبين...</p></div>
           )}
         </div>
         {!isTvPlayer && renderPlayerStatus(submittedIds, 'submit')}
@@ -303,10 +319,10 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
               </div>
             </>
           ) : (
-            <div className="waiting-box" style={{textAlign: 'center'}}>
-              <p style={{fontSize: '4rem', margin: 0}}></p>
+            <div className="waiting-box waiting-pulse" style={{textAlign: 'center'}}>
+              <p style={{fontSize: '3rem', margin: 0}}>🗳️</p>
               <h3 style={{color: '#E65100'}}>تم التصويت!</h3>
-              <p style={{color: '#555', fontSize: '1.2rem'}}>في انتظار باقي اللاعبين...</p>
+              <div className="waiting-dots"><span>.</span><span>.</span><span>.</span></div>
             </div>
           )}
         </div>
@@ -372,6 +388,15 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
             );
           })}
         </div>
+        {/* MVP */}
+        {roundData.mvp && (
+          <div className="mvp-banner" style={{fontSize: isTvDisplay ? '1.3rem' : '0.95rem'}}>
+            <span>⚡ أسرع إجابة صح: </span>
+            <img src={`/avatars/${roundData.mvp.avatarId}.png`} alt="" style={{width: isTvDisplay ? '40px' : '28px', height: isTvDisplay ? '40px' : '28px', objectFit: 'contain', verticalAlign: 'middle', margin: '0 5px'}} onError={(e) => e.target.src = '/avatars/1.png'} />
+            <strong>{roundData.mvp.username}</strong>
+            <span style={{color: '#FFD700', marginRight: '8px'}}> ({roundData.mvp.time} ثانية)</span>
+          </div>
+        )}
         <div style={{marginTop: 'auto', marginBottom: '30px', width:'100%', display:'flex', justifyContent:'center'}}>
           {isHost ? (
             <button className="action-btn" onClick={onShowScoreboard} style={{width: isTvDisplay ? '300px' : '200px', backgroundColor: '#E65100', fontSize: isTvDisplay ? '1.8rem' : undefined, padding: isTvDisplay ? '20px' : undefined}}>
@@ -442,7 +467,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
           {isHost ? (
             <button className="action-btn" onClick={onNextRound} style={isTvDisplay ? {fontSize:'1.8rem', padding:'18px 40px'} : undefined}>الجولة التالية ➡</button>
           ) : (
-            <p className="waiting-text">القائد يراجع النتائج...</p>
+            <p className="waiting-text waiting-pulse">القائد يراجع النتائج...</p>
           )}
         </div>
       </div>

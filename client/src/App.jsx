@@ -213,6 +213,7 @@ function App() {
 
   // حالة لتخزين الفائز النهائي (لحل مشكلة تغير الفائز عند الخروج)
   const [finalWinner, setFinalWinner] = useState(null);
+  const [gameStats, setGameStats] = useState({});
 
   const [settings, setSettings] = useState({
     timePerRound: 45,
@@ -381,11 +382,12 @@ function App() {
     });
 
     // حل مشكلة تغير الفائز: تثبيت الفائز عند انتهاء اللعبة
-    socket.on('game_over', () => {
+    socket.on('game_over', (data) => {
       setGameState('FINISHED');
+      setGameStats(data?.playerStats || {});
       setPlayers(currentPlayers => {
         const sorted = [...currentPlayers].sort((a, b) => b.score - a.score);
-        setFinalWinner(sorted[0]); 
+        setFinalWinner(sorted[0]);
         return currentPlayers;
       });
     });
@@ -513,17 +515,72 @@ function App() {
 
       {gameState === 'FINISHED' && finalWinner && (
         <div className="game-over-screen-final">
-          <h1 className="winner-title-text">الفائز هو</h1>
-          <img 
-            src={`/avatars/${finalWinner.avatarId}.png`} 
-            alt={finalWinner.username} 
-            className="winner-avatar-clean" 
-          />
-          <h2 className="winner-name-text">{finalWinner.username}</h2>
-          
+          {/* Confetti */}
+          <div className="confetti-container">
+            {Array.from({length: 50}).map((_, i) => (
+              <div key={i} className="confetti-piece" style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 3}s`,
+                backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'][i % 8],
+                width: `${6 + Math.random() * 8}px`,
+                height: `${6 + Math.random() * 8}px`,
+              }} />
+            ))}
+          </div>
+
+          <h1 className="winner-title-text" style={{animation: 'bounceIn 0.8s ease-out'}}>🏆 الفائز 🏆</h1>
+
+          {/* Top 3 Podium */}
+          <div className="podium-container">
+            {(() => {
+              const sorted = [...players].sort((a, b) => b.score - a.score);
+              const top3 = sorted.slice(0, 3);
+              const medals = ['🥇', '🥈', '🥉'];
+              const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3.length >= 2 ? [top3[1], top3[0]] : [top3[0]];
+              const podiumHeights = top3.length >= 3 ? [100, 140, 70] : top3.length >= 2 ? [100, 140] : [140];
+              const podiumRanks = top3.length >= 3 ? [1, 0, 2] : top3.length >= 2 ? [1, 0] : [0];
+
+              return podiumOrder.map((p, idx) => (
+                <div key={p.id} className="podium-player" style={{animationDelay: `${idx * 0.2 + 0.3}s`}}>
+                  <span style={{fontSize: '2.5rem'}}>{medals[podiumRanks[idx]]}</span>
+                  <img src={`/avatars/${p.avatarId}.png`} alt={p.username} className="podium-avatar"
+                    onError={(e) => e.target.src = '/avatars/1.png'} />
+                  <span className="podium-name">{p.username}</span>
+                  <div className="podium-bar" style={{height: `${podiumHeights[idx]}px`}}>
+                    <span className="podium-score">{p.score}</span>
+                  </div>
+                </div>
+              ));
+            })()}
+          </div>
+
+          {/* Player Stats */}
+          <div className="stats-container">
+            <h3 style={{color: '#FFD700', margin: '0 0 15px', fontSize: '1.3rem'}}>📊 الإحصائيات</h3>
+            {players.sort((a, b) => b.score - a.score).map(p => {
+              const stats = gameStats[p.id] || {};
+              return (
+                <div key={p.id} className="stat-row">
+                  <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <img src={`/avatars/${p.avatarId}.png`} alt="" style={{width: '35px', height: '35px', objectFit: 'contain'}}
+                      onError={(e) => e.target.src = '/avatars/1.png'} />
+                    <span style={{fontWeight: 'bold', color: '#FFF'}}>{p.username}</span>
+                  </div>
+                  <div style={{display: 'flex', gap: '15px', fontSize: '0.85rem', color: '#FFD700'}}>
+                    <span>✅ {stats.correctAnswers || 0}/{stats.totalRounds || 0}</span>
+                    {stats.fastestTime && <span>⚡ {stats.fastestTime}ث</span>}
+                    {(stats.fooledCount || 0) > 0 && <span>🎭 {stats.fooledCount}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
           <button className="btn-restart-simple" onClick={() => {
             socket.emit('reset_to_lobby');
             setFinalWinner(null);
+            setGameStats({});
           }}>
              لعب مرة أخرى ↻
           </button>

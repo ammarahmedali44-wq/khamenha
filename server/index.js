@@ -210,6 +210,64 @@
             }
       });
 
+      // Track per-player stats
+      if (!game.gameState.playerStats) game.gameState.playerStats = {};
+
+      // Find who voted for the real answer (correct guessers)
+      let fastestCorrectPlayer = null;
+      let fastestTime = Infinity;
+      const realOption = optionsMap.get(realAnsNorm);
+
+      game.gameState.votes.forEach((selectedOpt, voterId) => {
+        const selectedNorm = normalizeArabic(selectedOpt.text);
+        if (!game.gameState.playerStats[voterId]) {
+          game.gameState.playerStats[voterId] = { correctAnswers: 0, totalRounds: 0, fastestTime: null, fooledCount: 0 };
+        }
+        game.gameState.playerStats[voterId].totalRounds++;
+
+        if (selectedNorm === realAnsNorm) {
+          game.gameState.playerStats[voterId].correctAnswers++;
+          // Check vote timing for MVP
+          const voteTime = game.gameState.voteTimes?.get(voterId);
+          const roundStartTime = game.gameState.roundStartTime;
+          if (voteTime && roundStartTime) {
+            const elapsed = (voteTime - roundStartTime) / 1000;
+            if (!game.gameState.playerStats[voterId].fastestTime || elapsed < game.gameState.playerStats[voterId].fastestTime) {
+              game.gameState.playerStats[voterId].fastestTime = Math.round(elapsed * 10) / 10;
+            }
+            if (elapsed < fastestTime) {
+              fastestTime = elapsed;
+              fastestCorrectPlayer = voterId;
+            }
+          }
+        }
+      });
+
+      // Count how many people each player fooled
+      game.gameState.votes.forEach((selectedOpt, voterId) => {
+        const selectedNorm = normalizeArabic(selectedOpt.text);
+        const targetOption = optionsMap.get(selectedNorm);
+        if (targetOption && targetOption.type === 'FAKE') {
+          targetOption.owners.forEach(ownerId => {
+            if (ownerId !== 'server' && ownerId !== voterId) {
+              if (!game.gameState.playerStats[ownerId]) {
+                game.gameState.playerStats[ownerId] = { correctAnswers: 0, totalRounds: 0, fastestTime: null, fooledCount: 0 };
+              }
+              game.gameState.playerStats[ownerId].fooledCount++;
+            }
+          });
+        }
+      });
+
+      // MVP info
+      let mvpPlayer = null;
+      if (fastestCorrectPlayer) {
+        const p = game.getPlayer(fastestCorrectPlayer);
+        if (p) {
+          mvpPlayer = { id: p.id, username: p.username, avatarId: p.avatarId, time: Math.round(fastestTime * 10) / 10 };
+        }
+      }
+
       io.to(game.roomCode).emit('update_players', game.getAllPlayers());
 
       const resultsOptions = Array.from(optionsMap.values());
@@ -218,7 +276,8 @@
         resultsOptions: resultsOptions,
         realAnswer: realAns,
         roundNumber: game.gameState.roundIndex + 1,
-        totalRounds: game.gameState.totalRounds
+        totalRounds: game.gameState.totalRounds,
+        mvp: mvpPlayer
       });
     };
 
@@ -261,6 +320,8 @@
       };
 
       game.gameState.roundData = payload;
+      game.gameState.roundStartTime = Date.now();
+      game.gameState.voteTimes = new Map();
 
       io.to(game.roomCode).emit('phase_guessing', payload);
 
@@ -337,7 +398,9 @@
           game.gameState.totalRounds += 1;
           io.to(game.roomCode).emit('error_msg', 'تعادل! جولة حاسمة لكسر التعادل');
         } else {
-          io.to(game.roomCode).emit('game_over');
+          io.to(game.roomCode).emit('game_over', {
+            playerStats: game.gameState.playerStats || {}
+          });
           return;
         }
       }
@@ -491,6 +554,7 @@
       game.resetGame();
       game.gameState.totalRounds = game.gameState.settings.totalRounds || 10;
       game.gameState.clientSeenIds = clientSeenIds;
+      game.gameState.playerStats = {};
 
       io.to(game.roomCode).emit('update_players', game.getAllPlayers());
       io.to(game.roomCode).emit('game_started');
@@ -537,6 +601,9 @@
 
       game.gameState.fakeAnswers.set(socket.id, fakeText);
       game.gameState.answersType.set(socket.id, 'HUMAN');
+      // Track submission time for MVP
+      if (!game.gameState.submitTimes) game.gameState.submitTimes = new Map();
+      game.gameState.submitTimes.set(socket.id, Date.now());
 
       const submittedIds = Array.from(game.gameState.fakeAnswers.keys());
       io.to(game.roomCode).emit('phase_writing', {
@@ -559,6 +626,8 @@
       if (game.gameState.settings.tvMode && voter.isHost) return;
 
       game.gameState.votes.set(socket.id, selectedOption);
+      if (!game.gameState.voteTimes) game.gameState.voteTimes = new Map();
+      game.gameState.voteTimes.set(socket.id, Date.now());
       const votedIds = Array.from(game.gameState.votes.keys());
 
       io.to(game.roomCode).emit('phase_guessing', {

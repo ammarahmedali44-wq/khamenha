@@ -1066,22 +1066,25 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #E91E63; /* الخلفية الزهرية */
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 20px; /* مسافات بين العناصر */
+  gap: 10px;
   z-index: 2000;
+  overflow-y: auto;
+  padding: 30px 0;
 }
 
 /* كلمة "الفائز" */
 .winner-title-text {
-  color: #FFEB3B; /* أصفر */
-  font-size: 3rem; /* حجم كبير للموبايل */
+  color: #FFD700;
+  font-size: 2.5rem;
   font-weight: 900;
   margin: 0;
-  text-shadow: 0 4px 0 rgba(0,0,0,0.1); /* ظل خفيف للنص */
+  text-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  animation: bounceIn 0.8s ease-out;
 }
 
 /* صورة الفائز (بدون إطار أو خلفية) */
@@ -1885,3 +1888,166 @@ body {
   flex: 1 1 40% !important;
   min-width: 300px !important;
 }
+
+/* ===== Skeleton Loading ===== */
+.skeleton-img {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 10px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== Phase Transitions ===== */
+.phase-enter {
+  animation: fadeSlideIn 0.4s ease-out forwards;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== MVP Banner ===== */
+.mvp-banner {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 15px 20px;
+  animation: slideUpFade 0.5s ease-out;
+  border: 2px solid #FFD700;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  flex-wrap: wrap;
+}
+
+/* ===== Waiting Animation ===== */
+.waiting-pulse {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+@keyframes gentlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.waiting-dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  font-size: 2rem;
+  color: #E65100;
+  font-weight: bold;
+}
+.waiting-dots span {
+  animation: dotBounce 1.4s infinite ease-in-out;
+}
+.waiting-dots span:nth-child(1) { animation-delay: 0s; }
+.waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+.waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+}
+
+/* ===== Confetti ===== */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: confettiFall linear infinite;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== Bounce In ===== */
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===== Podium ===== */
+.podium-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+.podium-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideUpFade 0.6s ease-out forwards;
+  opacity: 0;
+}
+.podium-avatar {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  margin: 5px 0;
+}
+.podium-name {
+  font-weight: bold;
+  color: #FFD700;
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.podium-bar {
+  width: 80px;
+  background: linear-gradient(180deg, #FFD700 0%, #FFA000 100%);
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
+  box-shadow: 0 -2px 10px rgba(255, 215, 0, 0.3);
+}
+.podium-score {
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #3E2723;
+}
+
+/* ===== Stats Container ===== */
+.stats-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px 20px;
+  width: 90%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.stat-row:last-child {
+  border-bottom: none;
+}
+
