@@ -111,7 +111,8 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
               <div key={catKey} style={{
                 backgroundColor: '#009688', color: 'white', padding: '25px 40px',
                 fontSize: '2rem', fontWeight: 'bold', borderRadius: '15px',
-                boxShadow: '0 6px 0 #00796B', minWidth: '200px', textAlign: 'center'
+                boxShadow: '0 6px 0 #00796B', minWidth: '200px', textAlign: 'center',
+                fontFamily: "'Lalezar', system-ui"
               }}>
                 {getCategoryName(catKey)}
               </div>

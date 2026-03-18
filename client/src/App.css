@@ -1874,6 +1874,12 @@ body {
 .tv-mode {
   min-height: 100vh;
 }
+.tv-mode h1, .tv-mode h2, .tv-mode h3, .tv-mode p, .tv-mode span {
+  font-family: 'Changa', sans-serif;
+}
+.tv-mode button, .tv-mode .action-btn {
+  font-family: 'Lalezar', system-ui !important;
+}
 
 .tv-results {
   display: flex !important;
