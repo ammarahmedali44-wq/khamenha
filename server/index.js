@@ -457,7 +457,11 @@
     socket.on('join_game', safeHandler(function handleJoin(data) {
       const roomCode = data.codeInput;
       const game = games.get(roomCode);
-      if (!game) throw new Error('الكود غير صحيح');
+      if (!game) {
+        socket.emit('error_msg', 'الكود غير صحيح');
+        socket.emit('join_failed');
+        return;
+      }
 
       const existingPlayerEntry = Array.from(game.players.entries()).find(
         ([id, p]) => p.username === data.username && p.disconnected === true
@@ -521,9 +525,26 @@
         return;
       }
 
+      // Clear any disconnect timer for the kicked player
+      const targetPlayer = game.getPlayer(targetPlayerId);
+      if (targetPlayer && targetPlayer.disconnectTimer) {
+        clearTimeout(targetPlayer.disconnectTimer);
+        targetPlayer.disconnectTimer = null;
+      }
+
+      // Clean up kicked player's data from current round
+      game.gameState.fakeAnswers.delete(targetPlayerId);
+      game.gameState.answersType.delete(targetPlayerId);
+      game.gameState.votes.delete(targetPlayerId);
+      if (game.gameState.voteTimes) game.gameState.voteTimes.delete(targetPlayerId);
+      if (game.gameState.submitTimes) game.gameState.submitTimes.delete(targetPlayerId);
+
       const success = game.kickPlayer(targetPlayerId);
 
       if (success) {
+        // Clean up socketToRoom mapping
+        socketToRoom.delete(targetPlayerId);
+
         io.to(targetPlayerId).emit('kicked_out');
         const targetSocket = io.sockets.sockets.get(targetPlayerId);
         if (targetSocket) {

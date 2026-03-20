@@ -289,6 +289,11 @@ function App() {
     });
     socket.on('error_msg', (msg) => alert(msg));
 
+    socket.on('join_failed', () => {
+      localStorage.removeItem('gameSession');
+      setGameState('WELCOME');
+    });
+
     socket.on('join_success', (data) => {
       if (data && data.isHost !== undefined) setIsMyHost(data.isHost);
       if (data && data.players) setPlayers(data.players);
@@ -397,7 +402,7 @@ function App() {
       
       socket.off('connect'); socket.off('disconnect');
       socket.off('room_created'); socket.off('room_info');
-      socket.off('error_msg'); socket.off('join_success');
+      socket.off('error_msg'); socket.off('join_failed'); socket.off('join_success');
       socket.off('update_players'); socket.off('settings_update');
       socket.off('kicked_out'); 
       socket.off('game_reset'); 
