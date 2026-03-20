@@ -1881,6 +1881,21 @@ body {
   font-family: 'Lalezar', system-ui !important;
 }
 
+/* ===== TV Player Mode (Phone as controller) ===== */
+.tv-player-mode {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.tv-player-mode h1, .tv-player-mode h2, .tv-player-mode h3, .tv-player-mode p, .tv-player-mode span {
+  font-family: 'Changa', sans-serif;
+}
+.tv-player-mode button, .tv-player-mode .action-btn {
+  font-family: 'Lalezar', system-ui !important;
+}
+.tv-player-mode .game-input {
+  font-family: 'Changa', sans-serif !important;
+}
+
 .tv-results {
   display: flex !important;
   flex-wrap: wrap !important;

@@ -13,7 +13,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
   // TV mode: host = TV display, players = phone controls
   const isTvDisplay = tvMode && isHost;
   const isTvPlayer = tvMode && !isHost;
-  const tvClass = isTvDisplay ? ' tv-mode' : '';
+  const tvClass = isTvDisplay ? ' tv-mode' : (isTvPlayer ? ' tv-player-mode' : '');
   // Active players count (exclude host in TV mode)
   const activePlayers = tvMode ? players.filter(p => !p.isHost) : players;
   const activeCount = activePlayers.length;
@@ -127,7 +127,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
 
     // Normal / TV Player: can select if it's their turn
     return (
-      <div className="full-screen-container" style={{ justifyContent: 'center' }}>
+      <div className={`full-screen-container${tvClass}`} style={{ justifyContent: 'center' }}>
         {renderRoundInfo()}
         <div style={{marginBottom: '15px'}}>
           <img src={`/avatars/${roundData.turnPlayerAvatarId}.png`} alt="avatar" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover' }} onError={(e) => e.target.src = '/avatars/1.png'}/>
@@ -201,7 +201,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
     return (
       <>
       <ImageZoomOverlay src={zoomedImg} onClose={() => setZoomedImg(null)} />
-      <div className="full-screen-container" style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
+      <div className={`full-screen-container${tvClass}`} style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
         <div className="timer-bar-container" style={{width: '100%', height: '10px', backgroundColor: '#eee', position: 'absolute', top: 0, left: 0}}>
           <div className="timer-bar-fill" key={`writing-${roundData?.roundNumber}`} style={{
             height: '100%', backgroundColor: '#E65100', width: '100%',
@@ -287,7 +287,7 @@ const GameScreen = ({ phase, roundData, players, settings, onSubmitFake, onVote,
 
     // Normal / TV Player: vote from phone
     return (
-      <div className="full-screen-container" style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
+      <div className={`full-screen-container${tvClass}`} style={{justifyContent: 'flex-start', paddingTop: '10px'}}>
         <div className="timer-bar-container" style={{width: '100%', height: '10px', backgroundColor: '#eee', position: 'absolute', top: 0, left: 0}}>
           <div className="timer-bar-fill" key={`guessing-${roundData?.roundNumber}`} style={{
             height: '100%', backgroundColor: '#E65100', width: '100%',
