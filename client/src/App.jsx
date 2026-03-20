@@ -251,23 +251,8 @@ function App() {
     socket.on('connect', () => {
       setIsConnected(true);
       setMyId(socket.id);
-      // Auto-rejoin if session exists within 5 minutes
-      try {
-        const session = JSON.parse(localStorage.getItem('gameSession') || '{}');
-        if (session.username && session.roomCode && session.joined) {
-          const elapsed = Date.now() - (session.timestamp || 0);
-          if (elapsed < 5 * 60 * 1000) {
-            socket.emit('join_game', {
-              username: session.username,
-              avatarId: session.avatarId,
-              codeInput: session.roomCode,
-              isJoinMode: true
-            });
-          } else {
-            localStorage.removeItem('gameSession');
-          }
-        }
-      } catch(e) {}
+      // Clear old session - player starts fresh
+      localStorage.removeItem('gameSession');
     });
     socket.on('disconnect', () => setIsConnected(false));
     

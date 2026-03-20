@@ -1896,6 +1896,21 @@ body {
   font-family: 'Changa', sans-serif !important;
 }
 
+/* Force landscape layout on phone in TV player mode */
+@media screen and (orientation: portrait) and (max-width: 900px) {
+  .tv-player-mode {
+    transform: rotate(-90deg);
+    transform-origin: top left;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100vh;
+    height: 100vw;
+    min-height: unset;
+    overflow-y: auto;
+  }
+}
+
 .tv-results {
   display: flex !important;
   flex-wrap: wrap !important;
